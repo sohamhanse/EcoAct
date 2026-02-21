@@ -3,7 +3,14 @@ import { View, Text, StyleSheet } from "react-native";
 import { COLORS } from "@/constants/colors";
 import { SPACING } from "@/constants/spacing";
 import { RADIUS } from "@/constants/radius";
-import { SHADOWS } from "@/constants/shadows";
+
+const shadowMd = {
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 4 },
+  shadowOpacity: 0.08,
+  shadowRadius: 12,
+  elevation: 4,
+};
 
 type Props = {
   thisMonthCo2: number;
@@ -18,12 +25,12 @@ export const StatsTileRow = React.memo(function StatsTileRow({
 }: Props) {
   return (
     <View style={styles.row}>
-      <View style={[styles.tile, SHADOWS.md]}>
+      <View style={[styles.tile, shadowMd]}>
         <Text style={styles.label}>This Month</Text>
         <Text style={styles.value}>{thisMonthCo2} kg</Text>
         <Text style={styles.sublabel}>CO₂ saved</Text>
       </View>
-      <View style={[styles.tile, SHADOWS.md]}>
+      <View style={[styles.tile, shadowMd]}>
         <Text style={styles.label}>vs Last Month</Text>
         <Text
           style={[
@@ -38,7 +45,7 @@ export const StatsTileRow = React.memo(function StatsTileRow({
           {monthOverMonthChange >= 0 ? "↑ more action" : "↓ less action"}
         </Text>
       </View>
-      <View style={[styles.tile, SHADOWS.md]}>
+      <View style={[styles.tile, shadowMd]}>
         <Text style={styles.label}>Per Member</Text>
         <Text style={styles.value}>{avgCo2PerMember} kg</Text>
         <Text style={styles.sublabel}>avg</Text>

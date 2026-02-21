@@ -6,6 +6,14 @@ import { COLORS } from "@/constants/colors";
 import { SPACING } from "@/constants/spacing";
 import { RADIUS } from "@/constants/radius";
 
+const shadowMd = {
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 4 },
+  shadowOpacity: 0.08,
+  shadowRadius: 12,
+  elevation: 4,
+};
+
 type Props = {
   challenge: CommunityChallengeResponse | null;
 };
@@ -98,7 +106,7 @@ const styles = StyleSheet.create({
     padding: SPACING.lg,
     borderLeftWidth: 4,
     borderLeftColor: COLORS.primary,
-    ...SHADOWS.md,
+    ...shadowMd,
   },
   cardCompleted: {
     borderLeftColor: COLORS.accent,
@@ -183,13 +191,3 @@ const styles = StyleSheet.create({
     marginTop: SPACING.sm,
   },
 });
-
-const SHADOWS = {
-  md: {
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12,
-    elevation: 4,
-  },
-};
