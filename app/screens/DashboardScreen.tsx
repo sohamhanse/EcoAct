@@ -9,11 +9,11 @@ import {
   TextInput,
   View,
 } from "react-native";
-import type { RootStackParamList } from "../../App";
+import type { LegacyStackParamList } from "@/navigation/AppNavigator";
 import { badgeLabels } from "../services/badgeEngine";
 import { useCarbonContext } from "../context/CarbonContext";
 
-type Props = NativeStackScreenProps<RootStackParamList, "Dashboard">;
+type Props = NativeStackScreenProps<LegacyStackParamList, "Dashboard">;
 
 function parseNumber(value: string): number {
   const normalized = value.replace(",", ".").replace(/[^0-9.]/g, "");

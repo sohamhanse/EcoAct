@@ -1,50 +1,55 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
-import type { AuthProvider, UserProfile } from "@/types/app";
+import * as authApi from "@/api/auth.api";
+import { getAccessToken } from "@/api/axiosInstance";
+import type { ApiUser } from "@/src/types";
 
 type AuthState = {
-  user: UserProfile | null;
+  user: ApiUser | null;
   hydrated: boolean;
-  setHydrated: (hydrated: boolean) => void;
-  login: (provider: AuthProvider, name: string, email: string) => void;
-  logout: () => void;
+  setUser: (user: ApiUser | null) => void;
+  setHydrated: (h: boolean) => void;
+  loginWithGoogle: (idToken: string) => Promise<void>;
+  logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
+  isAuthenticated: () => Promise<boolean>;
 };
-
-function normalizeName(name: string): string {
-  return name.trim().replace(/\s+/g, " ");
-}
-
-function normalizeEmail(email: string): string {
-  return email.trim().toLowerCase();
-}
-
-function buildUser(provider: AuthProvider, name: string, email: string): UserProfile {
-  const normalizedEmail = normalizeEmail(email);
-  const normalizedName = normalizeName(name);
-
-  return {
-    id: `${provider}-${normalizedEmail}`,
-    name: normalizedName,
-    email: normalizedEmail,
-    provider,
-    createdAt: new Date().toISOString(),
-  };
-}
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       hydrated: false,
+      setUser: (user) => set({ user }),
       setHydrated: (hydrated) => set({ hydrated }),
-      login: (provider, name, email) => set({ user: buildUser(provider, name, email) }),
-      logout: () => set({ user: null }),
+      loginWithGoogle: async (idToken: string) => {
+        const data = await authApi.googleAuth(idToken);
+        set({ user: data.user });
+      },
+      logout: async () => {
+        await authApi.logout();
+        set({ user: null });
+      },
+      refreshUser: async () => {
+        const token = await getAccessToken();
+        if (!token) return;
+        try {
+          const user = await authApi.getMe();
+          set({ user });
+        } catch {
+          set({ user: null });
+        }
+      },
+      isAuthenticated: async () => {
+        const token = await getAccessToken();
+        return !!token && !!get().user;
+      },
     }),
     {
-      name: "ecoact-auth-store",
+      name: "ecotrack-auth-store",
       storage: createJSONStorage(() => AsyncStorage),
-      partialize: (state) => ({ user: state.user }),
+      partialize: (s) => ({ user: s.user }),
       onRehydrateStorage: () => (state) => {
         state?.setHydrated(true);
       },

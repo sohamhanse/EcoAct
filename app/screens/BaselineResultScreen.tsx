@@ -1,10 +1,10 @@
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { PieChart } from "react-native-chart-kit";
 import { Pressable, ScrollView, StyleSheet, Text, View, useWindowDimensions } from "react-native";
-import type { RootStackParamList } from "../../App";
+import type { LegacyStackParamList } from "@/navigation/AppNavigator";
 import { useCarbonContext } from "../context/CarbonContext";
 
-type Props = NativeStackScreenProps<RootStackParamList, "BaselineResult">;
+type Props = NativeStackScreenProps<LegacyStackParamList, "BaselineResult">;
 
 function sourceLabel(value: string): string {
   if (value === "transport") {

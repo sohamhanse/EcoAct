@@ -1,62 +1,90 @@
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useEffect, useRef } from "react";
 import { ActivityIndicator, Animated, Easing, StyleSheet, Text, View } from "react-native";
-import type { RootStackParamList } from "../../App";
-import { useCarbonContext } from "../context/CarbonContext";
+import type { RootStackParamList } from "@/navigation/AppNavigator";
+import { useAuthStore } from "@/store/useAuthStore";
+import { getAccessToken } from "@/api/axiosInstance";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { COLORS } from "@/constants/colors";
+
+const ONBOARDING_KEY = "ecotrack_onboarding_done";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Splash">;
 
 export default function SplashScreen({ navigation }: Props) {
-  const { isHydrated, entryRoute } = useCarbonContext();
+  const { user, hydrated, refreshUser } = useAuthStore();
   const pulse = useRef(new Animated.Value(0.95)).current;
   const fade = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(pulse, {
-          toValue: 1.05,
-          duration: 900,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
-        }),
-        Animated.timing(pulse, {
-          toValue: 0.95,
-          duration: 900,
-          easing: Easing.inOut(Easing.ease),
-          useNativeDriver: true,
-        }),
-      ]),
-    ).start();
-
-    Animated.timing(fade, {
-      toValue: 1,
-      duration: 700,
-      easing: Easing.out(Easing.ease),
-      useNativeDriver: true,
-    }).start();
+    Animated.parallel([
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(pulse, {
+            toValue: 1.05,
+            duration: 900,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: true,
+          }),
+          Animated.timing(pulse, {
+            toValue: 0.95,
+            duration: 900,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: true,
+          }),
+        ]),
+      ),
+      Animated.timing(fade, {
+        toValue: 1,
+        duration: 700,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+    ]).start();
   }, [fade, pulse]);
 
   useEffect(() => {
-    if (!isHydrated) {
-      return;
+    if (!hydrated) return;
+    let cancelled = false;
+    async function decideRoute() {
+      const token = await getAccessToken();
+      if (cancelled) return;
+      if (token && user) {
+        navigation.replace("Main");
+        return;
+      }
+      if (token && !user) {
+        try {
+          await refreshUser();
+          if (cancelled) return;
+          navigation.replace("Main");
+        } catch {
+          navigation.replace("Onboarding");
+        }
+        return;
+      }
+      const onboardingDone = await AsyncStorage.getItem(ONBOARDING_KEY);
+      if (onboardingDone === "true") {
+        navigation.replace("Auth");
+      } else {
+        navigation.replace("Onboarding");
+      }
     }
-
-    const timeout = setTimeout(() => {
-      navigation.replace(entryRoute);
-    }, 2500);
-
-    return () => clearTimeout(timeout);
-  }, [entryRoute, isHydrated, navigation]);
+    const t = setTimeout(decideRoute, 1500);
+    return () => {
+      cancelled = true;
+      clearTimeout(t);
+    };
+  }, [hydrated, user, navigation, refreshUser]);
 
   return (
     <View style={styles.container}>
       <Animated.View style={[styles.logoCircle, { transform: [{ scale: pulse }], opacity: fade }]}>
-        <Text style={styles.logoText}>EA</Text>
+        <Text style={styles.logoText}>ET</Text>
       </Animated.View>
-      <Animated.Text style={[styles.title, { opacity: fade }]}>EcoAct</Animated.Text>
+      <Animated.Text style={[styles.title, { opacity: fade }]}>EcoTrack</Animated.Text>
       <Animated.Text style={[styles.tagline, { opacity: fade }]}>Track. Act. Reduce.</Animated.Text>
-      {!isHydrated ? <ActivityIndicator size="small" color="#d1fae5" style={styles.loader} /> : null}
+      {!hydrated ? <ActivityIndicator size="small" color={COLORS.primaryPale} style={styles.loader} /> : null}
     </View>
   );
 }
@@ -66,14 +94,14 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#064e3b",
+    backgroundColor: COLORS.primary,
     paddingHorizontal: 24,
   },
   logoCircle: {
     width: 94,
     height: 94,
     borderRadius: 999,
-    backgroundColor: "#10b981",
+    backgroundColor: COLORS.primaryLight,
     alignItems: "center",
     justifyContent: "center",
   },

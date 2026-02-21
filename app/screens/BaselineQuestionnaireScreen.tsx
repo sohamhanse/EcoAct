@@ -2,7 +2,7 @@ import Slider from "@react-native-community/slider";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
-import type { RootStackParamList } from "../../App";
+import type { LegacyStackParamList } from "@/navigation/AppNavigator";
 import { useCarbonContext } from "../context/CarbonContext";
 import type {
   BaselineQuestionnaire,
@@ -14,7 +14,7 @@ import type {
   PublicTransportFrequency,
 } from "../types/domain";
 
-type Props = NativeStackScreenProps<RootStackParamList, "BaselineQuestionnaire">;
+type Props = NativeStackScreenProps<LegacyStackParamList, "BaselineQuestionnaire">;
 
 const TOTAL_STEPS = 10;
 
