@@ -60,3 +60,61 @@ export interface LeaderboardEntry {
   totalPoints: number;
   totalCo2Saved: number;
 }
+
+export type ChallengeStatus = "active" | "completed" | "failed" | "upcoming";
+
+export interface CommunityChallengeResponse {
+  _id: string;
+  title: string;
+  description: string;
+  goalCo2Kg: number;
+  currentCo2Kg: number;
+  progressPercent: number;
+  daysRemaining: number;
+  hoursRemaining: number;
+  status: ChallengeStatus;
+  participantCount: number;
+  startDate: string;
+  endDate: string;
+  completedAt: string | null;
+}
+
+export type ActivityType =
+  | "mission_complete"
+  | "member_joined"
+  | "badge_earned"
+  | "challenge_completed"
+  | "milestone";
+
+export interface ActivityFeedItem {
+  _id: string;
+  type: ActivityType;
+  user: { name: string; avatar: string } | null;
+  text: string;
+  subtext: string;
+  icon: string;
+  iconColor: string;
+  timeAgo: string;
+  createdAt: string;
+}
+
+export interface CommunityStatsResponse {
+  community: { name: string; type: string; memberCount: number };
+  stats: {
+    totalCo2SavedAllTime: number;
+    thisMonthCo2: number;
+    lastMonthCo2: number;
+    monthOverMonthChange: number;
+    thisMonthMissions: number;
+    avgCo2PerMember: number;
+  };
+  weeklyTrend: Array<{ date: string; dayLabel: string; co2Saved: number; missionCount: number }>;
+  topContributors: Array<{
+    rank: number;
+    userId: string;
+    name: string;
+    avatar: string;
+    co2Saved: number;
+    missionCount: number;
+  }>;
+}

@@ -7,6 +7,8 @@ import { Community } from "../models/Community.model.js";
 import { calculatePoints, getStreakMultiplier } from "../services/points.service.js";
 import { updateStreak } from "../services/streak.service.js";
 import { getNewlyEarnedBadges } from "../services/badge.service.js";
+import { contributeToCommunityChallenge } from "../services/challenge.service.js";
+import { createMissionComplete, createBadgeEarned } from "../services/communityActivity.service.js";
 import { success, error } from "../utils/response.utils.js";
 import type { AuthRequest } from "../middleware/auth.middleware.js";
 
@@ -30,7 +32,7 @@ export async function recommended(req: AuthRequest, res: Response): Promise<void
   const latestLog = await FootprintLog.findOne({ userId: req.user.userId })
     .sort({ loggedAt: -1 })
     .lean();
-    
+
   let topCategory = "transport";
   if (latestLog?.breakdown) {
     const b = latestLog.breakdown as { transport: number; food: number; energy: number; shopping: number };
@@ -107,6 +109,15 @@ export async function complete(req: AuthRequest, res: Response): Promise<void> {
     await Community.findByIdAndUpdate(user.communityId, {
       $inc: { totalCo2Saved: mission.co2Saved, totalPoints: pointsAwarded },
     });
+    await contributeToCommunityChallenge(req.user!.userId, mission.co2Saved);
+    await createMissionComplete(user.communityId, user._id as mongoose.Types.ObjectId, {
+      missionTitle: mission.title,
+      missionCo2Saved: mission.co2Saved,
+      missionCategory: mission.category,
+    });
+    for (const badgeId of newlyEarned) {
+      await createBadgeEarned(user.communityId, user._id as mongoose.Types.ObjectId, badgeId);
+    }
   }
   success(res, {
     pointsAwarded,

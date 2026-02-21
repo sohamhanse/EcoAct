@@ -1,9 +1,11 @@
 import type { Response } from "express";
+import mongoose from "mongoose";
 import { Community } from "../models/Community.model.js";
 import { User } from "../models/User.model.js";
-import { UserMission } from "../models/UserMission.model.js";
 import { success, error } from "../utils/response.utils.js";
 import type { AuthRequest } from "../middleware/auth.middleware.js";
+import { ensureActiveChallenge } from "../services/challenge.service.js";
+import { createMemberJoined } from "../services/communityActivity.service.js";
 
 export async function list(req: AuthRequest, res: Response): Promise<void> {
   const type = req.query.type as string | undefined;
@@ -61,6 +63,11 @@ export async function join(req: AuthRequest, res: Response): Promise<void> {
       totalCo2Saved: user.totalCo2Saved,
     },
   });
+  await ensureActiveChallenge(new mongoose.Types.ObjectId(id));
+  await createMemberJoined(
+    new mongoose.Types.ObjectId(id),
+    user._id as mongoose.Types.ObjectId,
+  );
   const updated = await Community.findById(id).lean();
   success(res, { community: updated });
 }

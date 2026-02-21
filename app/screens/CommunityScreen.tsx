@@ -8,6 +8,8 @@ import {
   ActivityIndicator,
   RefreshControl,
   TextInput,
+  ScrollView,
+  Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useAuthStore } from "@/store/useAuthStore";
@@ -17,6 +19,16 @@ import type { ApiCommunity } from "@/src/types";
 import { COLORS } from "@/constants/colors";
 import { SPACING } from "@/constants/spacing";
 import { RADIUS } from "@/constants/radius";
+import { useCommunityStats } from "@/hooks/useCommunityStats";
+import { useChallenge } from "@/hooks/useChallenge";
+import { useActivityFeed } from "@/hooks/useActivityFeed";
+import { CommunityHeroBanner } from "@/components/community/CommunityHeroBanner";
+import { StatsTileRow } from "@/components/community/StatsTileRow";
+import { ChallengeCard } from "@/components/community/ChallengeCard";
+import { WeeklyTrendChart } from "@/components/community/WeeklyTrendChart";
+import { TopContributorRow } from "@/components/community/TopContributorRow";
+import { ActivityFeed } from "@/components/community/ActivityFeed";
+import { ChallengeCompletionModal } from "@/components/community/ChallengeCompletionModal";
 
 type Tab = "discover" | "mine";
 
@@ -32,6 +44,11 @@ export default function CommunityScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [joiningId, setJoiningId] = useState<string | null>(null);
+
+  const communityId = mine?._id ?? null;
+  const { stats, loading: statsLoading, refetch: refetchStats } = useCommunityStats(communityId);
+  const { challenge, showCelebration, dismissCelebration, refetch: refetchChallenge } = useChallenge(communityId);
+  const { activities, loading: feedLoading, hasMore, loadMore, refetch: refetchFeed } = useActivityFeed(communityId, { limit: 5 });
 
   const loadDiscover = useCallback(async () => {
     try {
@@ -83,12 +100,27 @@ export default function CommunityScreen() {
     }
   }
 
-  async function handleLeave() {
-    try {
-      await leaveCommunity();
-      setMine(null);
-      await useAuthStore.getState().refreshUser();
-    } catch {}
+  function handleLeave() {
+    Alert.alert("Leave community", "Are you sure you want to leave this community?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Leave",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            await leaveCommunity();
+            setMine(null);
+            await useAuthStore.getState().refreshUser();
+          } catch {}
+        },
+      },
+    ]);
+  }
+
+  function onRefreshMine() {
+    refetchStats();
+    refetchChallenge();
+    refetchFeed();
   }
 
   return (
@@ -136,14 +168,56 @@ export default function CommunityScreen() {
         <ActivityIndicator color={COLORS.primary} style={{ marginTop: SPACING.xl }} />
       ) : tab === "mine" ? (
         mine ? (
-          <View style={styles.mineCard}>
-            <Text style={styles.mineName}>{mine.name}</Text>
-            <Text style={styles.mineType}>{mine.type}</Text>
-            <Text style={styles.mineMeta}>{mine.memberCount} members · {mine.totalCo2Saved} kg saved</Text>
+          <ScrollView
+            style={styles.scroll}
+            contentContainerStyle={styles.scrollContent}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={() => { setRefreshing(true); load(); onRefreshMine(); }} tintColor={COLORS.primary} />
+            }
+          >
+            <CommunityHeroBanner
+              name={mine.name}
+              type={mine.type}
+              memberCount={mine.memberCount}
+              totalCo2Saved={mine.totalCo2Saved}
+            />
+            {statsLoading ? (
+              <ActivityIndicator color={COLORS.primary} style={{ marginVertical: SPACING.lg }} />
+            ) : stats ? (
+              <>
+                <StatsTileRow
+                  thisMonthCo2={stats.stats.thisMonthCo2}
+                  monthOverMonthChange={stats.stats.monthOverMonthChange}
+                  avgCo2PerMember={stats.stats.avgCo2PerMember}
+                />
+                <Text style={styles.sectionTitle}>THIS WEEK'S CHALLENGE</Text>
+                <ChallengeCard challenge={challenge} />
+                <WeeklyTrendChart
+                  data={stats.weeklyTrend}
+                  maxValue={Math.max(1, ...stats.weeklyTrend.map((d) => d.co2Saved))}
+                />
+                <TopContributorRow
+                  contributors={stats.topContributors}
+                  currentUserId={user?._id}
+                />
+                <ActivityFeed
+                  activities={activities}
+                  loading={feedLoading}
+                  hasMore={hasMore}
+                  onLoadMore={loadMore}
+                  limit={5}
+                />
+              </>
+            ) : (
+              <>
+                <Text style={styles.sectionTitle}>THIS WEEK'S CHALLENGE</Text>
+                <ChallengeCard challenge={challenge} />
+              </>
+            )}
             <Pressable style={styles.leaveBtn} onPress={handleLeave}>
               <Text style={styles.leaveBtnLabel}>Leave community</Text>
             </Pressable>
-          </View>
+          </ScrollView>
         ) : (
           <Text style={styles.empty}>You haven't joined a community yet. Discover and join one above.</Text>
         )
@@ -177,6 +251,12 @@ export default function CommunityScreen() {
           }}
         />
       )}
+
+      <ChallengeCompletionModal
+        visible={showCelebration}
+        challenge={challenge}
+        onDismiss={dismissCelebration}
+      />
     </View>
   );
 }
@@ -194,11 +274,20 @@ const styles = StyleSheet.create({
   tabTextActive: { color: COLORS.primary, fontWeight: "600" },
   search: { marginHorizontal: SPACING.base, marginBottom: SPACING.sm, padding: SPACING.md, backgroundColor: COLORS.surface, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.border, fontSize: 15 },
   typeRow: { flexDirection: "row", paddingHorizontal: SPACING.base, gap: SPACING.sm, marginBottom: SPACING.sm },
-  typeChip: { paddingVertical: 6, paddingHorizontal: 12, borderRadius: RADIUS.full, backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border },
+  typeChip: { paddingVertical: 6, paddingHorizontal: 12, borderRadius: 999, backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border },
   typeChipActive: { backgroundColor: COLORS.primaryPale, borderColor: COLORS.primary },
   typeChipText: { fontSize: 13, color: COLORS.textSecondary },
   typeChipTextActive: { color: COLORS.primary, fontWeight: "600" },
   list: { padding: SPACING.base, paddingBottom: SPACING["3xl"] },
+  scroll: { flex: 1 },
+  scrollContent: { padding: SPACING.base, paddingBottom: SPACING["3xl"] },
+  sectionTitle: {
+    fontSize: 12,
+    fontWeight: "700",
+    color: COLORS.textMuted,
+    letterSpacing: 0.5,
+    marginBottom: SPACING.sm,
+  },
   card: { backgroundColor: COLORS.surface, borderRadius: RADIUS.md, padding: SPACING.lg, marginBottom: SPACING.md, borderWidth: 1, borderColor: COLORS.border },
   cardName: { fontSize: 18, fontWeight: "700", color: COLORS.textPrimary },
   cardType: { fontSize: 13, color: COLORS.textSecondary, marginTop: 2, textTransform: "capitalize" },
@@ -208,11 +297,7 @@ const styles = StyleSheet.create({
   joinBtnDisabled: { opacity: 0.7 },
   joinBtnLabel: { color: "#fff", fontWeight: "600" },
   joinedLabel: { marginTop: 12, fontSize: 14, color: COLORS.success, fontWeight: "600" },
-  mineCard: { margin: SPACING.base, backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, padding: SPACING.xl, borderWidth: 1, borderColor: COLORS.border },
-  mineName: { fontSize: 22, fontWeight: "700", color: COLORS.textPrimary },
-  mineType: { fontSize: 14, color: COLORS.textSecondary, marginTop: 4, textTransform: "capitalize" },
-  mineMeta: { fontSize: 14, color: COLORS.textMuted, marginTop: 8 },
-  leaveBtn: { marginTop: SPACING.lg, paddingVertical: 10, alignItems: "center" },
+  leaveBtn: { marginTop: SPACING.xl, paddingVertical: 10, alignItems: "center" },
   leaveBtnLabel: { color: COLORS.danger, fontWeight: "600" },
   empty: { padding: SPACING.xl, fontSize: 15, color: COLORS.textSecondary, textAlign: "center" },
 });

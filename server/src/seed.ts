@@ -63,9 +63,9 @@ async function seed() {
     console.log("Seeded", SEED_MISSIONS.length, "missions");
   }
 
-  const communityCount = await Community.countDocuments();
-  if (communityCount === 0) {
-    const communities = await Community.insertMany(
+  let communities = await Community.find().lean();
+  if (communities.length === 0) {
+    const inserted = await Community.insertMany(
       SEED_COMMUNITIES.map((c) => ({
         ...c,
         memberCount: 0,
@@ -73,12 +73,17 @@ async function seed() {
         totalPoints: 0,
       })),
     );
+    communities = inserted;
     console.log("Seeded", communities.length, "communities");
+  }
+  const { ensureActiveChallenge } = await import("./services/challenge.service.js");
+  for (const c of communities) {
+    await ensureActiveChallenge(c._id);
   }
 
   const userCount = await User.countDocuments();
   if (userCount === 0) {
-    const communities = await Community.find().limit(10).lean();
+    const commList = await Community.find().limit(10).lean();
     const demoUsers = DEMO_NAMES.map((name, i) => ({
       googleId: `demo-${i}-${Date.now()}`,
       name,
@@ -91,11 +96,11 @@ async function seed() {
       longestStreak: Math.floor(Math.random() * 20) + 1,
       lastActiveDate: new Date(),
       badges: [],
-      communityId: communities[i % communities.length]?._id ?? null,
+      communityId: commList[i % commList.length]?._id ?? null,
       role: "user",
     }));
     await User.insertMany(demoUsers);
-    for (const c of communities) {
+    for (const c of commList) {
       const members = demoUsers.filter((u) => u.communityId?.toString() === c._id.toString());
       const totalPoints = members.reduce((s, u) => s + u.totalPoints, 0);
       const totalCo2Saved = members.reduce((s, u) => s + u.totalCo2Saved, 0);

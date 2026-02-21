@@ -36,6 +36,9 @@ app.use(errorMiddleware);
 
 async function main() {
   await connectDB(MONGODB_URI);
+  const { expireChallenges } = await import("./services/challenge.service.js");
+  setInterval(expireChallenges, 60 * 60 * 1000);
+  expireChallenges().catch((e) => console.error("Challenge expiry:", e));
   app.listen(PORT, () => console.log(`EcoTrack server listening on port ${PORT}`));
 }
 
