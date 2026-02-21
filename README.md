@@ -1,84 +1,47 @@
-# EcoAct (React Native / Expo)
+# EcoAct MVP (Expo)
 
-EcoAct is a sustainability engagement MVP inspired by the UN ActNow model.
-It includes:
+React Native (Expo) sustainability engagement app implementing:
 
-- Carbon footprint calculator with lifestyle questionnaire
-- Action missions with estimated CO2 savings
-- Gamification (points, streaks, badges)
-- User accounts (email + Google demo mode)
-- Persistent dashboard and profile progress
+- Splash -> Onboarding -> Auth -> Baseline questionnaire -> Baseline result -> Daily dashboard loop
+- Local-only persistence with AsyncStorage
+- Carbon baseline engine + daily quick logs + monthly utility updates
+- Personalized daily mission pool (easy/medium/hard)
+- Gamification: points, streaks, bonuses, badges
 
-## Tech Stack
+## App Flow
 
-- Expo + React Native + Expo Router
-- TypeScript
-- Zustand + AsyncStorage persistence
+1. Splash (2.5s) with animated logo and auth state routing
+2. Onboarding intro
+3. Authentication
+   - Google sign-in (local MVP OAuth-style simulation)
+   - Manual signup with validation
+4. Baseline setup (10-step questionnaire)
+5. Baseline result screen with pie chart and India comparison
+6. Dashboard core loop:
+   - Daily quick log popup
+   - Monthly utility update prompt on day 1
+   - Mission completion and live impact progress
 
-## MVP Features
+## Service Modules
 
-### 1) Carbon Footprint Calculator
+- `app/services/authService.ts`
+- `app/services/carbonCalculationService.ts`
+- `app/services/missionRecommendationEngine.ts`
+- `app/services/streakEngine.ts`
+- `app/services/pointsEngine.ts`
+- `app/services/badgeEngine.ts`
+- `app/services/analyticsService.ts`
 
-- Inputs: transport, food, home energy, shopping behavior
-- Estimation logic with emission factors in `features/carbon/emissionFactors.ts`
-- Annual result + category breakdown and personalized focus tips
-
-### 2) Action Missions
-
-- Predefined mission library in `features/missions/missionList.ts`
-- Each mission has expected CO2 savings and points
-- Mission completion tracked per day
-
-### 3) Gamification
-
-- Points awarded per mission
-- Daily streak logic
-- Badge unlocks based on milestones
-
-### 4) User Accounts and Dashboard
-
-- Login with email or Google demo mode
-- Persisted user session and progress
-- Dashboard with baseline footprint, reductions, and progress
-
-## Project Structure
-
-- `app/auth.tsx`: login flow
-- `app/(tabs)/index.tsx`: dashboard
-- `app/(tabs)/calculator.tsx`: calculator questionnaire and results
-- `app/(tabs)/missions.tsx`: missions and completion tracking
-- `app/(tabs)/profile.tsx`: account, badges, reset/sign-out
-- `store/useAuthStore.ts`: auth session state
-- `store/useCarbonStore.ts`: carbon baseline and breakdown
-- `store/useMissionStore.ts`: mission completion, points, badges, streaks
-
-## Run Locally
-
-1. Install dependencies:
+## Run
 
 ```bash
 npm install
-```
-
-2. Start Expo:
-
-```bash
 npm run start
 ```
 
-3. Open on device/simulator from Expo CLI options.
-
-## Validation
+## Validate
 
 ```bash
 npm run lint
 npx tsc --noEmit
 ```
-
-## Next Steps for Production
-
-1. Replace Google demo mode with real OAuth (`expo-auth-session` or Firebase Auth).
-2. Add backend API for multi-device sync, organization challenges, and leaderboard.
-3. Version emission factors by region and source dataset.
-4. Add event analytics and experiment flags for engagement optimization.
-5. Add notifications/reminders for daily streak retention.
