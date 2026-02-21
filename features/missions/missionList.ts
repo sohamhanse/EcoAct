@@ -1,14 +1,60 @@
-export const missions = [
-    {
-      id: "m1",
-      title: "Skip meat for a day",
-      co2Saved: 2.5,
-      difficulty: "Easy",
-    },
-    {
-      id: "m2",
-      title: "Cycle instead of car (5km)",
-      co2Saved: 1,
-      difficulty: "Easy",
-    },
-  ];
+import type { Mission } from "@/types/app";
+
+export const missions: Mission[] = [
+  {
+    id: "mission-meat-free-lunch",
+    title: "Choose a plant-based lunch",
+    description: "Replace one meat-heavy meal with a plant-based option.",
+    co2SavedKg: 1.8,
+    points: 20,
+    category: "food",
+  },
+  {
+    id: "mission-bike-commute",
+    title: "Bike or walk for one commute",
+    description: "Swap one short car trip for cycling or walking.",
+    co2SavedKg: 2.1,
+    points: 24,
+    category: "transport",
+  },
+  {
+    id: "mission-public-transport",
+    title: "Use public transport today",
+    description: "Replace private car travel with bus or metro for one day.",
+    co2SavedKg: 1.5,
+    points: 18,
+    category: "transport",
+  },
+  {
+    id: "mission-low-energy-evening",
+    title: "Run a low-energy evening",
+    description: "Turn off standby devices and reduce heating or cooling by 1 degree.",
+    co2SavedKg: 1.2,
+    points: 14,
+    category: "homeEnergy",
+  },
+  {
+    id: "mission-cold-wash",
+    title: "Wash laundry in cold water",
+    description: "Use a cold cycle and run only full loads.",
+    co2SavedKg: 0.8,
+    points: 10,
+    category: "homeEnergy",
+  },
+  {
+    id: "mission-batch-deliveries",
+    title: "Batch online orders",
+    description: "Combine online purchases into one delivery and avoid express shipping.",
+    co2SavedKg: 1.0,
+    points: 12,
+    category: "shopping",
+  },
+  {
+    id: "mission-reuse-item",
+    title: "Repair or reuse an item",
+    description: "Avoid one new purchase by repairing or reusing what you have.",
+    co2SavedKg: 0.9,
+    points: 12,
+    category: "shopping",
+  },
+];

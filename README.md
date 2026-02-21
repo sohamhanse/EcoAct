@@ -1,50 +1,84 @@
-# Welcome to your Expo app 👋
+# EcoAct (React Native / Expo)
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+EcoAct is a sustainability engagement MVP inspired by the UN ActNow model.
+It includes:
 
-## Get started
+- Carbon footprint calculator with lifestyle questionnaire
+- Action missions with estimated CO2 savings
+- Gamification (points, streaks, badges)
+- User accounts (email + Google demo mode)
+- Persistent dashboard and profile progress
 
-1. Install dependencies
+## Tech Stack
 
-   ```bash
-   npm install
-   ```
+- Expo + React Native + Expo Router
+- TypeScript
+- Zustand + AsyncStorage persistence
 
-2. Start the app
+## MVP Features
 
-   ```bash
-   npx expo start
-   ```
+### 1) Carbon Footprint Calculator
 
-In the output, you'll find options to open the app in a
+- Inputs: transport, food, home energy, shopping behavior
+- Estimation logic with emission factors in `features/carbon/emissionFactors.ts`
+- Annual result + category breakdown and personalized focus tips
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+### 2) Action Missions
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- Predefined mission library in `features/missions/missionList.ts`
+- Each mission has expected CO2 savings and points
+- Mission completion tracked per day
 
-## Get a fresh project
+### 3) Gamification
 
-When you're ready, run:
+- Points awarded per mission
+- Daily streak logic
+- Badge unlocks based on milestones
+
+### 4) User Accounts and Dashboard
+
+- Login with email or Google demo mode
+- Persisted user session and progress
+- Dashboard with baseline footprint, reductions, and progress
+
+## Project Structure
+
+- `app/auth.tsx`: login flow
+- `app/(tabs)/index.tsx`: dashboard
+- `app/(tabs)/calculator.tsx`: calculator questionnaire and results
+- `app/(tabs)/missions.tsx`: missions and completion tracking
+- `app/(tabs)/profile.tsx`: account, badges, reset/sign-out
+- `store/useAuthStore.ts`: auth session state
+- `store/useCarbonStore.ts`: carbon baseline and breakdown
+- `store/useMissionStore.ts`: mission completion, points, badges, streaks
+
+## Run Locally
+
+1. Install dependencies:
 
 ```bash
-npm run reset-project
+npm install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+2. Start Expo:
 
-## Learn more
+```bash
+npm run start
+```
 
-To learn more about developing your project with Expo, look at the following resources:
+3. Open on device/simulator from Expo CLI options.
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## Validation
 
-## Join the community
+```bash
+npm run lint
+npx tsc --noEmit
+```
 
-Join our community of developers creating universal apps.
+## Next Steps for Production
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+1. Replace Google demo mode with real OAuth (`expo-auth-session` or Firebase Auth).
+2. Add backend API for multi-device sync, organization challenges, and leaderboard.
+3. Version emission factors by region and source dataset.
+4. Add event analytics and experiment flags for engagement optimization.
+5. Add notifications/reminders for daily streak retention.
