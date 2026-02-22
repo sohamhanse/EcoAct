@@ -19,7 +19,8 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.ecoact"
     },
     "web": {
       "output": "static",
@@ -41,6 +42,12 @@
     ],
     "experiments": {
       "reactCompiler": true
-    }
+    },
+    "extra": {
+      "eas": {
+        "projectId": "a9abac70-45a8-4e9e-be9c-d1044a8e55b4"
+      }
+    },
+    "owner": "omkar2306s-organization"
   }
 }

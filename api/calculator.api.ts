@@ -1,16 +1,8 @@
 import { axiosInstance } from "./axiosInstance";
 import type { FootprintBreakdown } from "@/src/types";
+import type { CalculatorAnswers } from "@/constants/emissionFactors";
 
-export interface CalculatorSubmitAnswers {
-  carKmPerWeek: number;
-  publicTransportFrequency: "daily" | "few_times_week" | "rarely" | "never";
-  dietType: "vegan" | "vegetarian" | "non_vegetarian";
-  meatFrequency: "daily" | "few_times_week" | "rarely" | "never";
-  acUsageHours: number;
-  electricityRange: "low" | "medium" | "high" | "very_high";
-  onlinePurchasesPerMonth: number;
-  flightsPerYear: number;
-}
+export type CalculatorSubmitAnswers = CalculatorAnswers;
 
 export interface SubmitResponse {
   success: boolean;

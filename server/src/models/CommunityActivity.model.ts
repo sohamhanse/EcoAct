@@ -14,6 +14,7 @@ export interface ICommunityActivityMetadata {
   badgeName?: string;
   milestoneValue?: number;
   milestoneUnit?: string;
+  milestoneLabel?: string;
 }
 
 export interface ICommunityActivity extends Document {
@@ -40,6 +41,7 @@ const communityActivitySchema = new Schema<ICommunityActivity>(
       badgeName: String,
       milestoneValue: Number,
       milestoneUnit: String,
+      milestoneLabel: String,
     },
   },
   { timestamps: true },

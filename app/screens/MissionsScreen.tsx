@@ -12,6 +12,8 @@ import {
 import { useAuthStore } from "@/store/useAuthStore";
 import { getMissions, completeMission, getMissionStats } from "@/api/missions.api";
 import type { ApiMission } from "@/src/types";
+import { ShareBottomSheet } from "@/components/sharing/ShareBottomSheet";
+import type { SharePayload } from "@/components/sharing/ShareCard";
 import { COLORS } from "@/constants/colors";
 import { SPACING } from "@/constants/spacing";
 import { RADIUS } from "@/constants/radius";
@@ -33,7 +35,14 @@ export default function MissionsScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [completingId, setCompletingId] = useState<string | null>(null);
-  const [modal, setModal] = useState<{ points: number; co2: number; badges: string[] } | null>(null);
+  const [modal, setModal] = useState<{
+    points: number;
+    co2: number;
+    badges: string[];
+    newTotalCo2Saved?: number;
+    missionsCount?: number;
+  } | null>(null);
+  const [sharePayload, setSharePayload] = useState<SharePayload | null>(null);
   const [stats, setStats] = useState<{ missionsCount: number; totalCo2Saved: number; totalPoints: number } | null>(null);
 
   const load = useCallback(async () => {
@@ -58,7 +67,13 @@ export default function MissionsScreen() {
     try {
       const res = await completeMission(missionId);
       await refreshUser();
-      setModal({ points: res.pointsAwarded, co2: res.co2SavedAwarded, badges: res.newlyEarnedBadges ?? [] });
+      setModal({
+        points: res.pointsAwarded,
+        co2: res.co2SavedAwarded,
+        badges: res.newlyEarnedBadges ?? [],
+        newTotalCo2Saved: res.newTotalCo2Saved,
+        missionsCount: (stats?.missionsCount ?? 0) + 1,
+      });
       load();
     } catch {
       setCompletingId(null);
@@ -130,6 +145,24 @@ export default function MissionsScreen() {
                 <Text style={styles.modalPoints}>+{modal.points} points</Text>
                 <Text style={styles.modalCo2}>−{modal.co2} kg CO₂ saved</Text>
                 {modal.badges.length > 0 && <Text style={styles.modalBadges}>New badge(s): {modal.badges.join(", ")}</Text>}
+                {modal.badges.length > 0 && (
+                  <Pressable
+                    style={styles.shareBadgeBtn}
+                    onPress={() => {
+                      const badgeName = modal.badges[0].replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+                      setSharePayload({
+                        type: "badge",
+                        data: {
+                          badgeName,
+                          co2Saved: modal.newTotalCo2Saved ?? 0,
+                          missionsDone: modal.missionsCount ?? 1,
+                        },
+                      });
+                    }}
+                  >
+                    <Text style={styles.shareBadgeBtnLabel}>📤 Share Badge</Text>
+                  </Pressable>
+                )}
               </>
             )}
             <Pressable style={styles.modalBtn} onPress={() => setModal(null)}>
@@ -138,6 +171,12 @@ export default function MissionsScreen() {
           </View>
         </Pressable>
       </Modal>
+
+      <ShareBottomSheet
+        visible={!!sharePayload}
+        payload={sharePayload}
+        onDismiss={() => setSharePayload(null)}
+      />
     </View>
   );
 }
@@ -173,4 +212,13 @@ const styles = StyleSheet.create({
   modalBadges: { fontSize: 13, color: COLORS.textSecondary, textAlign: "center", marginTop: 8 },
   modalBtn: { marginTop: SPACING.xl, backgroundColor: COLORS.primary, borderRadius: RADIUS.md, paddingVertical: 12, alignItems: "center" },
   modalBtnLabel: { color: "#fff", fontWeight: "600" },
+  shareBadgeBtn: {
+    marginTop: SPACING.md,
+    paddingVertical: 10,
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    borderRadius: RADIUS.md,
+  },
+  shareBadgeBtnLabel: { color: COLORS.primary, fontWeight: "600", fontSize: 14 },
 });

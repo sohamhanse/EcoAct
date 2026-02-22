@@ -64,12 +64,17 @@ export async function createMilestone(
   communityId: Types.ObjectId,
   milestoneValue: number,
   milestoneUnit: string,
+  options?: { userId?: Types.ObjectId; milestoneLabel?: string },
 ): Promise<void> {
   await CommunityActivity.create({
     communityId,
-    userId: null,
+    userId: options?.userId ?? null,
     type: "milestone",
-    metadata: { milestoneValue, milestoneUnit },
+    metadata: {
+      milestoneValue,
+      milestoneUnit,
+      milestoneLabel: options?.milestoneLabel,
+    },
   });
 }
 
@@ -80,14 +85,15 @@ function capitalize(s: string): string {
 export function formatActivityText(
   activity: {
     type: ActivityType;
-    metadata?: {
-      missionTitle?: string;
-      missionCo2Saved?: number;
-      missionCategory?: string;
-      badgeName?: string;
-      milestoneValue?: number;
-      milestoneUnit?: string;
-    };
+  metadata?: {
+    missionTitle?: string;
+    missionCo2Saved?: number;
+    missionCategory?: string;
+    badgeName?: string;
+    milestoneValue?: number;
+    milestoneUnit?: string;
+    milestoneLabel?: string;
+  };
   },
   userName: string,
 ): { text: string; subtext: string } {
@@ -114,10 +120,15 @@ export function formatActivityText(
         subtext: "Everyone contributed to this win",
       };
     case "milestone":
-      return {
-        text: `Community saved ${meta.milestoneValue ?? 0} kg CO₂ this week`,
-        subtext: "Weekly milestone hit 🌍",
-      };
+      return meta.milestoneLabel && userName
+        ? {
+            text: `${userName} completed: ${meta.milestoneLabel}`,
+            subtext: "Personal milestone hit 🌟",
+          }
+        : {
+            text: `Community saved ${meta.milestoneValue ?? 0} kg CO₂ this week`,
+            subtext: "Weekly milestone hit 🌍",
+          };
     default:
       return { text: "Activity", subtext: "" };
   }

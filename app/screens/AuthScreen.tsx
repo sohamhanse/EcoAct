@@ -1,23 +1,78 @@
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from "react-native";
+import * as AuthSession from "expo-auth-session";
 import axios from "axios";
 import type { RootStackParamList } from "@/navigation/AppNavigator";
 import { useAuthStore } from "@/store/useAuthStore";
 import { setTokens } from "@/api/axiosInstance";
 import type { ApiUser } from "@/src/types";
+import { makeRedirectUri, exchangeCodeForIdToken, GOOGLE_ISSUER } from "@/services/googleAuth";
 import { COLORS } from "@/constants/colors";
 import { SPACING } from "@/constants/spacing";
 import { RADIUS } from "@/constants/radius";
 
 const API_BASE = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:5000";
 const API_DEMO_URL = `${API_BASE}/api/auth/demo`;
+const GOOGLE_WEB_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID ?? "";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Auth">;
 
 export default function AuthScreen({ navigation }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const discovery = AuthSession.useAutoDiscovery(GOOGLE_ISSUER);
+  const redirectUri = makeRedirectUri();
+
+  const [request, response, promptAsync] = AuthSession.useAuthRequest(
+    {
+      clientId: GOOGLE_WEB_CLIENT_ID,
+      redirectUri,
+      scopes: ["openid", "email", "profile"],
+      usePKCE: true,
+      responseType: AuthSession.ResponseType.Code,
+    },
+    discovery ?? undefined
+  );
+
+  // After user returns from Google, exchange code for id_token and sign in
+  useEffect(() => {
+    if (!response || response.type !== "success" || !request || !discovery) return;
+    const { code } = response.params;
+    if (!code || !request.codeVerifier) return;
+
+    let cancelled = false;
+    (async () => {
+      setLoading(true);
+      setError("");
+      try {
+        const idToken = await exchangeCodeForIdToken(
+          code,
+          GOOGLE_WEB_CLIENT_ID,
+          redirectUri,
+          request.codeVerifier,
+          discovery
+        );
+        if (cancelled || !idToken) {
+          setError("Could not get Google sign-in token. Try again or use Demo login.");
+          return;
+        }
+        await useAuthStore.getState().loginWithGoogle(idToken);
+        if (!cancelled) navigation.replace("Main");
+      } catch (e) {
+        if (!cancelled) {
+          const msg = e && typeof e === "object" && "message" in e ? String((e as { message: string }).message) : "Google sign-in failed";
+          setError(msg);
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [response, request, discovery, redirectUri, navigation]);
 
   async function handleDemoLogin() {
     setError("");
@@ -49,9 +104,30 @@ export default function AuthScreen({ navigation }: Props) {
   }
 
   async function handleGoogleSignIn() {
-    // When @react-native-google-signin/google-signin is configured:
-    // const { idToken } = await GoogleSignin.getTokens(); await loginWithGoogle(idToken);
-    await handleDemoLogin();
+    if (!GOOGLE_WEB_CLIENT_ID?.trim()) {
+      setError("Google sign-in not configured. Use Demo login or set EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID.");
+      return;
+    }
+    if (!request) {
+      setError("Sign-in is still loading. Try again in a moment.");
+      return;
+    }
+    setError("");
+    setLoading(true);
+    try {
+      const result = await promptAsync();
+      if (result.type === "dismiss" || result.type === "cancel") {
+        setError("");
+      } else if (result.type !== "success") {
+        setError("Google sign-in was cancelled or failed.");
+      }
+      // If success, the useEffect above will exchange the code and sign in
+    } catch (e) {
+      const msg = e && typeof e === "object" && "message" in e ? String((e as { message: string }).message) : "Google sign-in failed";
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (

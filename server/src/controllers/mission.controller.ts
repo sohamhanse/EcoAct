@@ -9,6 +9,7 @@ import { updateStreak } from "../services/streak.service.js";
 import { getNewlyEarnedBadges } from "../services/badge.service.js";
 import { contributeToCommunityChallenge } from "../services/challenge.service.js";
 import { createMissionComplete, createBadgeEarned } from "../services/communityActivity.service.js";
+import { updateRecurringMilestones } from "../services/milestone.service.js";
 import { success, error } from "../utils/response.utils.js";
 import type { AuthRequest } from "../middleware/auth.middleware.js";
 
@@ -105,6 +106,7 @@ export async function complete(req: AuthRequest, res: Response): Promise<void> {
     lastActiveDate: today,
     badges: badgeEntries,
   });
+  await updateRecurringMilestones(req.user!.userId, mission.co2Saved);
   if (user.communityId) {
     await Community.findByIdAndUpdate(user.communityId, {
       $inc: { totalCo2Saved: mission.co2Saved, totalPoints: pointsAwarded },

@@ -13,9 +13,13 @@ import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useCommunityStore } from "@/store/useCommunityStore";
 import { getRecommendedMissions } from "@/api/missions.api";
+import { useMilestones } from "@/hooks/useMilestones";
 import { getMyCommunity } from "@/api/community.api";
 import type { MainStackParamList } from "@/navigation/MainNavigator";
 import type { ApiMission } from "@/src/types";
+import { MilestoneCard } from "@/components/milestones/MilestoneCard";
+import { ShareBottomSheet } from "@/components/sharing/ShareBottomSheet";
+import type { SharePayload } from "@/components/sharing/ShareCard";
 import { COLORS } from "@/constants/colors";
 import { SPACING } from "@/constants/spacing";
 import { RADIUS } from "@/constants/radius";
@@ -33,19 +37,22 @@ export default function HomeScreen() {
   const [missions, setMissions] = useState<ApiMission[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const { active: milestones, loading: milestonesLoading, refetch: refetchMilestones } = useMilestones();
+  const [sharePayload, setSharePayload] = useState<SharePayload | null>(null);
 
   const load = useCallback(async () => {
     try {
       const [rec, comm] = await Promise.all([getRecommendedMissions(), getMyCommunity()]);
       setMissions(rec);
       setMine(comm.community ?? null);
+      refetchMilestones();
     } catch {
       setMissions([]);
     } finally {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [setMine]);
+  }, [setMine, refetchMilestones]);
 
   useEffect(() => {
     load();
@@ -88,6 +95,24 @@ export default function HomeScreen() {
           <View style={[styles.progressFill, { width: `${progressToGoal}%` }]} />
         </View>
         <Text style={styles.progressLabel}>{saved} kg to Carbon Neutral Goal (2,000 kg/year)</Text>
+        {improvement > 5 && (
+          <Pressable
+            style={styles.shareProgress}
+            onPress={() =>
+              setSharePayload({
+                type: "footprint",
+                data: {
+                  improvementPercent: improvement,
+                  from: baseline,
+                  to: net,
+                  progressPercent: Math.round(progressToGoal),
+                },
+              })
+            }
+          >
+            <Text style={styles.shareProgressLabel}>Share your progress 📤</Text>
+          </Pressable>
+        )}
       </View>
 
       <View style={styles.statsRow}>
@@ -120,12 +145,31 @@ export default function HomeScreen() {
         </ScrollView>
       )}
 
+      <Text style={styles.sectionTitle}>My milestones</Text>
+      {milestonesLoading ? (
+        <ActivityIndicator color={COLORS.primary} size="small" style={{ marginVertical: SPACING.sm }} />
+      ) : milestones.length > 0 ? (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.milestoneScroll}>
+          {milestones.map((m) => (
+            <MilestoneCard key={m._id} milestone={m} />
+          ))}
+        </ScrollView>
+      ) : (
+        <Text style={styles.emptyMilestones}>Complete missions to unlock milestones</Text>
+      )}
+
       <Pressable style={styles.communityCard} onPress={() => navigation.navigate("Community")}>
         <Text style={styles.communityTitle}>Community</Text>
         <Text style={styles.communitySub}>
           {mine ? `${mine.name} · ${mine.totalCo2Saved} kg saved` : "Join a community"}
         </Text>
       </Pressable>
+
+      <ShareBottomSheet
+        visible={!!sharePayload}
+        payload={sharePayload}
+        onDismiss={() => setSharePayload(null)}
+      />
     </ScrollView>
   );
 }
@@ -156,6 +200,8 @@ const styles = StyleSheet.create({
   },
   progressFill: { height: "100%", backgroundColor: COLORS.primary, borderRadius: 4 },
   progressLabel: { fontSize: 11, color: COLORS.textMuted, marginTop: 4 },
+  shareProgress: { marginTop: SPACING.sm },
+  shareProgressLabel: { fontSize: 14, color: COLORS.primary, fontWeight: "600" },
   statsRow: { flexDirection: "row", gap: SPACING.sm, marginTop: SPACING.lg },
   statBox: {
     flex: 1,
@@ -169,6 +215,8 @@ const styles = StyleSheet.create({
   statLabel: { fontSize: 12, color: COLORS.textSecondary, marginTop: 2 },
   sectionTitle: { fontSize: 17, fontWeight: "600", color: COLORS.textPrimary, marginTop: SPACING.xl },
   missionScroll: { marginTop: SPACING.sm, marginHorizontal: -SPACING.base },
+  milestoneScroll: { marginTop: SPACING.sm, marginHorizontal: -SPACING.base, gap: SPACING.sm },
+  emptyMilestones: { fontSize: 13, color: COLORS.textMuted, marginTop: SPACING.sm },
   missionCard: {
     width: 160,
     marginLeft: SPACING.base,

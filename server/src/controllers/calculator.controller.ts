@@ -4,20 +4,22 @@ import { User } from "../models/User.model.js";
 import { calculateFootprint } from "../services/carbon.service.js";
 import { success, error } from "../utils/response.utils.js";
 import type { AuthRequest } from "../middleware/auth.middleware.js";
-import type { IFootprintAnswers } from "../models/FootprintLog.model.js";
+import type { ICalculatorAnswers } from "../constants/emissionFactors.js";
 
 export async function submit(req: AuthRequest, res: Response): Promise<void> {
   if (!req.user) {
     error(res, "Not authenticated", "UNAUTHORIZED", 401);
     return;
   }
-  const answers = req.body as IFootprintAnswers;
-  const { totalCo2, breakdown } = calculateFootprint(answers);
+  const answers = req.body as ICalculatorAnswers;
+  const { totalCo2, breakdown, gridFactorUsed, comparedToIndiaAvg } = calculateFootprint(answers);
   const log = await FootprintLog.create({
     userId: req.user.userId,
     answers,
     totalCo2,
     breakdown,
+    gridFactorUsed,
+    comparedToIndiaAvg,
   });
   await User.findByIdAndUpdate(req.user.userId, {
     footprintBaseline: totalCo2,

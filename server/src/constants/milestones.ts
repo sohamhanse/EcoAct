@@ -1,0 +1,133 @@
+export interface MilestoneTemplate {
+  id: string;
+  type: string;
+  period: "weekly" | "monthly";
+  targetValue: number;
+  unit: "kg_co2" | "missions" | "days";
+  label: string;
+  description: string;
+  bonusPoints: number;
+  badgeId: string | null;
+  difficulty: "easy" | "medium" | "hard";
+  icon: string;
+}
+
+export const MILESTONE_TEMPLATES: MilestoneTemplate[] = [
+  {
+    id: "weekly_co2_10",
+    type: "weekly_co2",
+    period: "weekly",
+    targetValue: 10,
+    unit: "kg_co2",
+    label: "Save 10 kg CO₂ this week",
+    description: "Complete any missions adding up to 10 kg CO₂ saved",
+    bonusPoints: 75,
+    badgeId: null,
+    difficulty: "easy",
+    icon: "leaf-outline",
+  },
+  {
+    id: "weekly_co2_25",
+    type: "weekly_co2",
+    period: "weekly",
+    targetValue: 25,
+    unit: "kg_co2",
+    label: "Save 25 kg CO₂ this week",
+    description: "Go further — 25 kg in 7 days is a meaningful impact",
+    bonusPoints: 150,
+    badgeId: null,
+    difficulty: "medium",
+    icon: "leaf",
+  },
+  {
+    id: "weekly_missions_5",
+    type: "weekly_missions",
+    period: "weekly",
+    targetValue: 5,
+    unit: "missions",
+    label: "Complete 5 missions this week",
+    description: "Build the habit — 5 actions across any category",
+    bonusPoints: 50,
+    badgeId: null,
+    difficulty: "easy",
+    icon: "checkbox-outline",
+  },
+  {
+    id: "weekly_missions_10",
+    type: "weekly_missions",
+    period: "weekly",
+    targetValue: 10,
+    unit: "missions",
+    label: "Complete 10 missions this week",
+    description: "A mission a day (plus a few extra) — strong week",
+    bonusPoints: 120,
+    badgeId: null,
+    difficulty: "medium",
+    icon: "checkbox",
+  },
+  {
+    id: "monthly_co2_50",
+    type: "monthly_co2",
+    period: "monthly",
+    targetValue: 50,
+    unit: "kg_co2",
+    label: "Save 50 kg CO₂ this month",
+    description: "Roughly equivalent to skipping 250 km of car travel",
+    bonusPoints: 200,
+    badgeId: "monthly_50_badge",
+    difficulty: "easy",
+    icon: "earth-outline",
+  },
+  {
+    id: "monthly_co2_100",
+    type: "monthly_co2",
+    period: "monthly",
+    targetValue: 100,
+    unit: "kg_co2",
+    label: "Save 100 kg CO₂ this month",
+    description: "Equivalent to planting 5 trees. Real, measurable impact.",
+    bonusPoints: 400,
+    badgeId: "monthly_100_badge",
+    difficulty: "medium",
+    icon: "earth",
+  },
+  {
+    id: "monthly_co2_200",
+    type: "monthly_co2",
+    period: "monthly",
+    targetValue: 200,
+    unit: "kg_co2",
+    label: "Save 200 kg CO₂ this month",
+    description: "Elite level. One of the top performers on EcoTrack.",
+    bonusPoints: 750,
+    badgeId: "monthly_200_badge",
+    difficulty: "hard",
+    icon: "trophy",
+  },
+  {
+    id: "monthly_missions_20",
+    type: "monthly_missions",
+    period: "monthly",
+    targetValue: 20,
+    unit: "missions",
+    label: "Complete 20 missions this month",
+    description: "Consistency is the real superpower",
+    bonusPoints: 300,
+    badgeId: null,
+    difficulty: "medium",
+    icon: "checkmark-done",
+  },
+  {
+    id: "monthly_streak_21",
+    type: "monthly_streak",
+    period: "monthly",
+    targetValue: 21,
+    unit: "days",
+    label: "Maintain a 21-day streak",
+    description: "21 days to build a habit. You're building a lifestyle.",
+    bonusPoints: 500,
+    badgeId: "habit_builder_badge",
+    difficulty: "hard",
+    icon: "flame",
+  },
+];

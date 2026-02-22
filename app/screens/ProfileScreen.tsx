@@ -1,14 +1,23 @@
 import { useCallback, useEffect, useState } from "react";
 import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator, Alert } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useAuthStore } from "@/store/useAuthStore";
 import { getMe } from "@/api/auth.api";
 import { getCalculatorHistory } from "@/api/calculator.api";
+import { useMilestones } from "@/hooks/useMilestones";
+import { MilestoneCard } from "@/components/milestones/MilestoneCard";
+import { ShareBottomSheet } from "@/components/sharing/ShareBottomSheet";
+import type { SharePayload } from "@/components/sharing/ShareCard";
 import { COLORS } from "@/constants/colors";
 import { SPACING } from "@/constants/spacing";
 import { RADIUS } from "@/constants/radius";
 
-const BADGE_IDS = ["first_step", "eco_starter", "green_warrior", "climate_hero", "week_streak", "month_streak", "community_builder"];
+const BADGE_IDS = [
+  "first_step", "eco_starter", "green_warrior", "climate_hero",
+  "week_streak", "month_streak", "community_builder",
+  "monthly_50_badge", "monthly_100_badge", "monthly_200_badge", "habit_builder_badge",
+];
 
 export default function ProfileScreen() {
   const navigation = useNavigation();
@@ -17,6 +26,8 @@ export default function ProfileScreen() {
   const refreshUser = useAuthStore((s) => s.refreshUser);
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState<Array<{ totalCo2: number; loggedAt: string }>>([]);
+  const { active: milestones, history: milestoneHistory, loading: milestonesLoading } = useMilestones();
+  const [sharePayload, setSharePayload] = useState<SharePayload | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -52,8 +63,32 @@ export default function ProfileScreen() {
 
   if (!user) return null;
 
+  const baseline = user.footprintBaseline ?? 0;
+  const saved = user.totalCo2Saved ?? 0;
+  const current = Math.max(0, baseline - saved);
+  const improvement = baseline > 0 ? Math.round((saved / baseline) * 100) : 0;
+  const progressToNeutral = 2000 > 0 ? Math.min(100, (saved / 2000) * 100) : 0;
+
+  function openFootprintShare() {
+    setSharePayload({
+      type: "footprint",
+      data: {
+        improvementPercent: improvement,
+        from: baseline,
+        to: current,
+        progressPercent: Math.round(progressToNeutral),
+      },
+    });
+  }
+
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <View style={styles.header}>
+        <Text style={styles.headerTitle}>Profile</Text>
+        <Pressable onPress={openFootprintShare} style={styles.shareIcon}>
+          <Ionicons name="share-social-outline" size={24} color={COLORS.primary} />
+        </Pressable>
+      </View>
       <View style={styles.profileRow}>
         <View style={styles.avatar}>
           <Text style={styles.avatarText}>{user.name[0]}</Text>
@@ -81,6 +116,29 @@ export default function ProfileScreen() {
         ))}
       </View>
 
+      <Text style={styles.sectionTitle}>Milestones</Text>
+      {milestonesLoading ? (
+        <Text style={styles.empty}>Loading milestones…</Text>
+      ) : milestones.length > 0 ? (
+        <View style={styles.milestonesRow}>
+          {milestones.map((m) => (
+            <MilestoneCard key={m._id} milestone={m} />
+          ))}
+        </View>
+      ) : null}
+      {milestoneHistory.length > 0 && (
+        <View style={styles.milestoneHistory}>
+          {milestoneHistory.slice(0, 5).map((m) => (
+            <View key={m._id} style={styles.historyRow}>
+              <Text style={styles.historyDate}>{m.goal.label}</Text>
+              <Text style={[styles.historyVal, m.status === "completed" ? styles.completed : styles.failed]}>
+                {m.status === "completed" ? "✓" : "—"} {m.progress.currentValue}/{m.goal.targetValue}
+              </Text>
+            </View>
+          ))}
+        </View>
+      )}
+
       <Text style={styles.sectionTitle}>Footprint history</Text>
       {history.length === 0 ? (
         <Text style={styles.empty}>No footprint logs yet. Use the Calculator to set your baseline.</Text>
@@ -98,6 +156,12 @@ export default function ProfileScreen() {
       <Pressable style={styles.signOut} onPress={handleSignOut}>
         <Text style={styles.signOutLabel}>Sign out</Text>
       </Pressable>
+
+      <ShareBottomSheet
+        visible={!!sharePayload}
+        payload={sharePayload}
+        onDismiss={() => setSharePayload(null)}
+      />
     </ScrollView>
   );
 }
@@ -105,6 +169,15 @@ export default function ProfileScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   content: { padding: SPACING.base, paddingBottom: SPACING["3xl"] },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.base,
+  },
+  headerTitle: { fontSize: 20, fontWeight: "700", color: COLORS.textPrimary },
+  shareIcon: { padding: SPACING.sm },
   profileRow: { flexDirection: "row", alignItems: "center", marginBottom: SPACING.xl },
   avatar: { width: 64, height: 64, borderRadius: 32, backgroundColor: COLORS.primary, alignItems: "center", justifyContent: "center" },
   avatarText: { color: "#fff", fontSize: 24, fontWeight: "700" },
@@ -128,6 +201,10 @@ const styles = StyleSheet.create({
   historyDate: { fontSize: 14, color: COLORS.textSecondary },
   historyVal: { fontSize: 14, fontWeight: "600", color: COLORS.textPrimary },
   empty: { fontSize: 14, color: COLORS.textMuted, marginBottom: SPACING.lg },
+  milestonesRow: { flexDirection: "row", flexWrap: "wrap", gap: SPACING.sm, marginBottom: SPACING.lg },
+  milestoneHistory: { marginBottom: SPACING.lg },
+  completed: { color: COLORS.success },
+  failed: { color: COLORS.textMuted },
   signOut: { paddingVertical: SPACING.md, alignItems: "center" },
   signOutLabel: { color: COLORS.danger, fontWeight: "600", fontSize: 16 },
 });

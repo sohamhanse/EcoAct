@@ -1,19 +1,23 @@
 import mongoose, { Schema, type Document, type Model } from "mongoose";
 
-export type PublicTransportFrequency = "daily" | "few_times_week" | "rarely" | "never";
-export type DietType = "vegan" | "vegetarian" | "non_vegetarian";
-export type MeatFrequency = "daily" | "few_times_week" | "rarely" | "never";
-export type ElectricityRange = "low" | "medium" | "high" | "very_high";
-
 export interface IFootprintAnswers {
+  state?: string;
+  city?: string;
+  vehicleType?: string;
+  engineSize?: string;
   carKmPerWeek: number;
-  publicTransportFrequency: PublicTransportFrequency;
-  dietType: DietType;
-  meatFrequency: MeatFrequency;
-  acUsageHours: number;
-  electricityRange: ElectricityRange;
-  onlinePurchasesPerMonth: number;
+  twoWheelerKmPerWeek?: number;
+  publicTransportMode?: string;
+  publicTransportKmPerWeek?: number;
   flightsPerYear: number;
+  dietType: string;
+  acHoursPerDay?: number;
+  acTonnage?: string;
+  electricityRange: string;
+  onlinePurchasesPerMonth: number;
+  // Legacy fields for backward compatibility
+  publicTransportFrequency?: string;
+  meatFrequency?: string;
 }
 
 export interface IFootprintBreakdown {
@@ -28,6 +32,8 @@ export interface IFootprintLog extends Document {
   answers: IFootprintAnswers;
   totalCo2: number;
   breakdown: IFootprintBreakdown;
+  gridFactorUsed?: number;
+  comparedToIndiaAvg?: number;
   loggedAt: Date;
 }
 
@@ -35,14 +41,22 @@ const footprintLogSchema = new Schema<IFootprintLog>(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true },
     answers: {
+      state: String,
+      city: String,
+      vehicleType: String,
+      engineSize: String,
       carKmPerWeek: Number,
-      publicTransportFrequency: String,
+      twoWheelerKmPerWeek: Number,
+      publicTransportMode: String,
+      publicTransportKmPerWeek: Number,
+      flightsPerYear: Number,
       dietType: String,
-      meatFrequency: String,
-      acUsageHours: Number,
+      acHoursPerDay: Number,
+      acTonnage: String,
       electricityRange: String,
       onlinePurchasesPerMonth: Number,
-      flightsPerYear: Number,
+      publicTransportFrequency: String,
+      meatFrequency: String,
     },
     totalCo2: { type: Number, required: true },
     breakdown: {
@@ -51,6 +65,8 @@ const footprintLogSchema = new Schema<IFootprintLog>(
       energy: Number,
       shopping: Number,
     },
+    gridFactorUsed: Number,
+    comparedToIndiaAvg: Number,
     loggedAt: { type: Date, default: Date.now },
   },
   { timestamps: true },

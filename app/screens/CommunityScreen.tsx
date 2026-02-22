@@ -29,6 +29,8 @@ import { WeeklyTrendChart } from "@/components/community/WeeklyTrendChart";
 import { TopContributorRow } from "@/components/community/TopContributorRow";
 import { ActivityFeed } from "@/components/community/ActivityFeed";
 import { ChallengeCompletionModal } from "@/components/community/ChallengeCompletionModal";
+import { ShareBottomSheet } from "@/components/sharing/ShareBottomSheet";
+import type { SharePayload } from "@/components/sharing/ShareCard";
 
 type Tab = "discover" | "mine";
 
@@ -44,6 +46,7 @@ export default function CommunityScreen() {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [joiningId, setJoiningId] = useState<string | null>(null);
+  const [sharePayload, setSharePayload] = useState<SharePayload | null>(null);
 
   const communityId = mine?._id ?? null;
   const { stats, loading: statsLoading, refetch: refetchStats } = useCommunityStats(communityId);
@@ -255,7 +258,15 @@ export default function CommunityScreen() {
       <ChallengeCompletionModal
         visible={showCelebration}
         challenge={challenge}
+        communityName={mine?.name}
         onDismiss={dismissCelebration}
+        onShare={setSharePayload}
+      />
+
+      <ShareBottomSheet
+        visible={!!sharePayload}
+        payload={sharePayload}
+        onDismiss={() => setSharePayload(null)}
       />
     </View>
   );
