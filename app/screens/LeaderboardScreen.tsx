@@ -91,7 +91,7 @@ export default function LeaderboardScreen() {
             <View
               style={[styles.row, user?._id === item._id && styles.rowHighlight]}
               accessibilityLabel={`Rank ${item.rank}, ${item.name}, ${item.totalPoints} points, ${item.totalCo2Saved} kg saved`}
-              accessibilityRole="listitem"
+              accessibilityRole="text"
             >
               <Text style={styles.rank}>{item.rank}</Text>
               <View style={styles.avatar}><Text style={styles.avatarText}>{(item.name ?? "?")[0]}</Text></View>
