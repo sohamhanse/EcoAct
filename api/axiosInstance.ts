@@ -9,8 +9,8 @@ export const axiosInstance = axios.create({
   headers: { "Content-Type": "application/json" },
 });
 
-const ACCESS_KEY = "ecotrack_access_token";
-const REFRESH_KEY = "ecotrack_refresh_token";
+const ACCESS_KEY = "ecoact_access_token";
+const REFRESH_KEY = "ecoact_refresh_token";
 
 export async function getAccessToken(): Promise<string | null> {
   return AsyncStorage.getItem(ACCESS_KEY);

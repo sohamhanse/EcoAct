@@ -1,4 +1,4 @@
-# EcoTrack
+# EcoAct
 
 React Native (Expo) + Node.js full-stack app that tracks and rewards individual and community-level environmental actions. Built for hackathon demo with MongoDB, JWT auth, carbon calculator, missions, leaderboards, and communities.
 

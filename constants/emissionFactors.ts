@@ -1,5 +1,5 @@
 /**
- * EcoTrack India Emission Factors
+ * EcoAct India Emission Factors
  * Sources:
  * - Electricity: CEA CO2 Baseline Database v18 (2023), state-wise grid emission factors
  * - Transport: ICCT India LCA + MoRTH data (2022)

@@ -1,9 +1,9 @@
-import { OAuth2Client } from "google-auth-library";
 import type { Response } from "express";
+import { OAuth2Client } from "google-auth-library";
+import type { AuthRequest } from "../middleware/auth.middleware.js";
 import { User } from "../models/User.model.js";
 import { signAccessToken, signRefreshToken, verifyRefreshToken, type TokenPayload } from "../utils/jwt.utils.js";
-import { success, error } from "../utils/response.utils.js";
-import type { AuthRequest } from "../middleware/auth.middleware.js";
+import { error, success } from "../utils/response.utils.js";
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -93,7 +93,7 @@ export async function demoAuth(req: AuthRequest, res: Response): Promise<void> {
   }
   const body = (req.body || {}) as { name?: string; email?: string };
   const name = typeof body.name === "string" && body.name.trim() ? body.name.trim() : "Demo User";
-  const rawEmail = typeof body.email === "string" && body.email.trim() ? body.email.trim() : `demo-${Date.now()}@ecotrack.app`;
+  const rawEmail = typeof body.email === "string" && body.email.trim() ? body.email.trim() : `demo-${Date.now()}@ecoact.app`;
   const email = rawEmail.toLowerCase();
 
   let user = await User.findOne({ email });

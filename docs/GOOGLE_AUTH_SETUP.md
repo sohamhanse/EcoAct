@@ -1,6 +1,6 @@
 # Google Sign-In Setup
 
-EcoTrack uses Google OAuth (OpenID Connect) so users can sign in with their Google account. The app uses the **authorization code flow with PKCE** (no client secret), and the backend verifies the **id_token** from Google.
+EcoAct uses Google OAuth (OpenID Connect) so users can sign in with their Google account. The app uses the **authorization code flow with PKCE** (no client secret), and the backend verifies the **id_token** from Google.
 
 ## 1. Google Cloud Console
 

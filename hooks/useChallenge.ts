@@ -1,9 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getActiveChallenge } from "@/api/challenge.api";
 import type { CommunityChallengeResponse } from "@/src/types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useCallback, useEffect, useState } from "react";
 
-const SEEN_PREFIX = "ecotrack_challenge_seen_";
+const SEEN_PREFIX = "ecoact_challenge_seen_";
 
 export function useChallenge(communityId: string | null) {
   const [challenge, setChallenge] = useState<CommunityChallengeResponse | null>(null);

@@ -1,21 +1,21 @@
+import cors from "cors";
 import "dotenv/config";
 import express from "express";
-import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
 import { connectDB } from "./config/db.js";
-import { apiLimiter } from "./middleware/rateLimit.middleware.js";
 import { errorMiddleware } from "./middleware/error.middleware.js";
+import { apiLimiter } from "./middleware/rateLimit.middleware.js";
 import authRoutes from "./routes/auth.routes.js";
 import calculatorRoutes from "./routes/calculator.routes.js";
-import missionRoutes from "./routes/mission.routes.js";
-import leaderboardRoutes from "./routes/leaderboard.routes.js";
 import communityRoutes from "./routes/community.routes.js";
-import userRoutes from "./routes/user.routes.js";
+import leaderboardRoutes from "./routes/leaderboard.routes.js";
 import milestoneRoutes from "./routes/milestone.routes.js";
+import missionRoutes from "./routes/mission.routes.js";
+import userRoutes from "./routes/user.routes.js";
 
 const PORT = parseInt(process.env.PORT ?? "5000", 10);
-const MONGODB_URI = process.env.MONGODB_URI ?? "mongodb://localhost:27017/ecotrack";
+const MONGODB_URI = process.env.MONGODB_URI ?? "mongodb://localhost:27017/ecoact";
 
 const app = express();
 app.use(helmet());
@@ -44,7 +44,7 @@ async function main() {
   setInterval(expireRecurringMilestones, 24 * 60 * 60 * 1000);
   expireChallenges().catch((e) => console.error("Challenge expiry:", e));
   expireRecurringMilestones().catch((e) => console.error("Milestone expiry:", e));
-  app.listen(PORT, () => console.log(`EcoTrack server listening on port ${PORT}`));
+  app.listen(PORT, () => console.log(`EcoAct server listening on port ${PORT}`));
 }
 
 main().catch((err) => {

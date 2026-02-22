@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EcoAct — Measure. Act. Compete. Together.</title>
+  <meta name="description" content="EcoAct is India's first carbon footprint tracker that rewards every green action with points, badges, and real community impact.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            bg: '#060d09',
+            surface: '#0d1f12',
+            surface2: '#122318',
+            border: '#1e3828',
+            primary: '#1a6b3c',
+            'primary-light': '#2d9e5f',
+            accent: '#00c896',
+            'accent-warm': '#f4a261',
+            'text-primary': '#e8f5ee',
+            'text-secondary': '#7aab8c',
+            'text-muted': '#3d6650',
+          },
+          fontFamily: {
+            heading: ['Syne', 'sans-serif'],
+            body: ['Instrument Sans', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          animation: {
+            'fade-up': 'fadeUp 0.7s ease forwards',
+            'pulse-glow': 'pulseGlow 2s ease-in-out infinite',
+            'orb-float': 'orbFloat 10s ease-in-out infinite',
+            'orb-float-reverse': 'orbFloat 13s ease-in-out infinite reverse',
+            'breathe': 'breathe 8s ease-in-out infinite',
+            'ticker': 'ticker 30s linear infinite',
+            'count-up': 'countUp 0.1s ease forwards',
+            'draw-line': 'drawLine 1.5s ease forwards',
+          },
+          keyframes: {
+            fadeUp: {
+              '0%': { opacity: '0', transform: 'translateY(28px)' },
+              '100%': { opacity: '1', transform: 'translateY(0)' },
+            },
+            pulseGlow: {
+              '0%, 100%': { boxShadow: '0 0 0 0 rgba(0,200,150,0.4)' },
+              '50%': { boxShadow: '0 0 0 10px rgba(0,200,150,0)' },
+            },
+            orbFloat: {
+              '0%, 100%': { transform: 'translate(0, 0) scale(1)' },
+              '33%': { transform: 'translate(40px, -30px) scale(1.05)' },
+              '66%': { transform: 'translate(-25px, 40px) scale(0.97)' },
+            },
+            breathe: {
+              '0%, 100%': { opacity: '0.04' },
+              '50%': { opacity: '0.09' },
+            },
+            ticker: {
+              '0%': { transform: 'translateX(0)' },
+              '100%': { transform: 'translateX(-50%)' },
+            },
+            drawLine: {
+              '0%': { strokeDashoffset: '1000' },
+              '100%': { strokeDashoffset: '0' },
+            },
+          },
+        },
+      },
+    }
+  </script>
+  <style>
+    @media (hover: hover) {
+      * { cursor: none !important; }
+    }
+    @media (hover: none) {
+      #cursor, #cursor-ring { display: none !important; }
+      body { cursor: auto !important; }
+    }
+    body { background: #060d09; font-family: 'Instrument Sans', sans-serif; overflow-x: hidden; }
+    #cursor { position: fixed; width: 10px; height: 10px; background: #00c896; border-radius: 50%; pointer-events: none; z-index: 9999; transform: translate(-50%, -50%); transition: width 0.3s, height 0.3s; mix-blend-mode: screen; }
+    #cursor-ring { position: fixed; width: 36px; height: 36px; border: 1px solid rgba(0,200,150,0.5); border-radius: 50%; pointer-events: none; z-index: 9998; transform: translate(-50%, -50%); transition: all 0.08s ease-out; }
+    #cursor.hovered { width: 18px; height: 18px; }
+    #cursor-ring.hovered { width: 52px; height: 52px; border-color: rgba(0,200,150,0.8); }
+    body::after { content: ''; position: fixed; inset: 0; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E"); opacity: 0.03; pointer-events: none; z-index: 999; }
+    .reveal { opacity: 0; transform: translateY(32px); transition: opacity 0.7s ease, transform 0.7s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+    .reveal-delay-5 { transition-delay: 0.5s; }
+    .hex-grid { position: absolute; inset: 0; opacity: 0.025; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='56' height='100'%3E%3Cpath d='M28 66L0 50V17L28 1l28 16v33L28 66zm0-6l22-13V23L28 7 6 20v24l22 12z' fill='%2300c896'/%3E%3C/svg%3E"); background-size: 56px 100px; pointer-events: none; }
+    .orb { position: absolute; border-radius: 50%; filter: blur(80px); pointer-events: none; }
+    .section-line { width: 1px; height: 48px; background: linear-gradient(to bottom, #00c896, transparent); }
+    .progress-fill { width: 0%; transition: width 1.5s ease; }
+    .progress-fill.animated { width: var(--target-width); }
+    .ticker-wrap { overflow: hidden; }
+    .ticker-inner { display: flex; width: max-content; animation: ticker 30s linear infinite; }
+    .ticker-inner:hover { animation-play-state: paused; }
+    .card-hover { transition: all 0.3s ease; }
+    .card-hover:hover { transform: translateY(-4px); border-color: rgba(0,200,150,0.3) !important; box-shadow: 0 8px 40px rgba(0,200,150,0.1); }
+    .gradient-text { background: linear-gradient(135deg, #e8f5ee 0%, #00c896 50%, #2d9e5f 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .btn-glow { transition: all 0.25s ease; }
+    .btn-glow:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,200,150,0.35); }
+    .counter { font-variant-numeric: tabular-nums; }
+    #mobile-nav { display: none; }
+    #mobile-nav.open { display: flex; }
+    .underline-accent { position: relative; display: inline-block; }
+    .underline-accent::after { content: ''; position: absolute; bottom: -2px; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, #00c896, transparent); border-radius: 2px; }
+    #main-nav.scrolled { backdrop-filter: blur(20px); background: rgba(13,31,18,0.85); border-bottom: 1px solid #1e3828; }
+    #hamburger.active span:nth-child(1) { transform: rotate(45deg) translate(5px, 5px); }
+    #hamburger.active span:nth-child(2) { opacity: 0; }
+    #hamburger.active span:nth-child(3) { transform: rotate(-45deg) translate(5px, -5px); }
+    @keyframes ticker { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+  </style>
+</head>
+<body class="bg-bg text-text-primary antialiased">
+  <div id="cursor"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- NAVBAR -->
+  <nav id="main-nav" class="fixed top-0 left-0 right-0 z-[100] py-4 px-4 md:px-8 transition-all duration-300">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <a href="#" class="flex items-center gap-2 font-heading font-extrabold text-lg">
+        <span>🌿</span>
+        <span class="text-text-primary">Eco</span><span class="text-accent">Act</span>
+        <span class="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
+      </a>
+      <div class="hidden md:flex items-center gap-8">
+        <a href="#features" class="text-sm font-body font-medium text-text-secondary hover:text-text-primary transition">Features</a>
+        <a href="#why-india" class="text-sm font-body font-medium text-text-secondary hover:text-text-primary transition">Why India</a>
+        <a href="#community" class="text-sm font-body font-medium text-text-secondary hover:text-text-primary transition">Community</a>
+        <a href="#tech-stack" class="text-sm font-body font-medium text-text-secondary hover:text-text-primary transition">Tech Stack</a>
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="#" class="hidden md:inline-block bg-accent text-bg font-heading font-semibold px-6 py-2.5 rounded-full btn-glow">Download App</a>
+        <button id="hamburger" class="md:hidden w-10 h-10 flex flex-col justify-center gap-1.5" aria-label="Menu">
+          <span class="w-6 h-0.5 bg-text-primary rounded transition-all"></span>
+          <span class="w-6 h-0.5 bg-text-primary rounded transition-all"></span>
+          <span class="w-6 h-0.5 bg-text-primary rounded transition-all"></span>
+        </button>
+      </div>
+    </div>
+  </nav>
+  <div id="mobile-nav" class="fixed inset-0 z-[90] bg-bg flex flex-col items-center justify-center gap-8 md:hidden">
+    <a href="#features" class="font-heading font-bold text-3xl text-text-primary">Features</a>
+    <a href="#why-india" class="font-heading font-bold text-3xl text-text-primary">Why India</a>
+    <a href="#community" class="font-heading font-bold text-3xl text-text-primary">Community</a>
+    <a href="#tech-stack" class="font-heading font-bold text-3xl text-text-primary">Tech Stack</a>
+    <a href="#" class="font-heading font-bold text-3xl text-accent">Download App</a>
+  </div>
+
+  <!-- HERO -->
+  <section class="min-h-screen relative flex items-center justify-center px-4 md:px-8 pt-24 pb-16">
+    <div class="hex-grid"></div>
+    <div class="orb orb-float w-[600px] h-[600px] -top-40 -left-40 bg-[radial-gradient(circle,rgba(0,200,150,0.06),transparent)]" style="animation: orbFloat 12s ease-in-out infinite;"></div>
+    <div class="orb w-[400px] h-[400px] top-20 -right-20 bg-[radial-gradient(circle,rgba(26,107,60,0.09),transparent)]" style="animation: orbFloat 15s ease-in-out infinite reverse;"></div>
+    <div class="orb w-[300px] h-[300px] -bottom-20 left-1/2 -translate-x-1/2 bg-[radial-gradient(circle,rgba(244,162,97,0.04),transparent)]" style="animation: orbFloat 18s ease-in-out infinite 5s;"></div>
+    <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+      <div class="w-[800px] h-[800px] bg-[radial-gradient(ellipse_at_center,rgba(0,200,150,0.07),transparent_65%)] animate-breathe"></div>
+    </div>
+    <div class="relative z-10 text-center max-w-4xl mx-auto">
+      <div class="reveal inline-block border border-accent/50 rounded-full px-4 py-1.5 text-[11px] font-heading font-semibold uppercase tracking-widest text-accent mb-8" style="animation-delay: 0.1s;">⚡ BUILT FOR INDIA  ·  HACKATHON 2025</div>
+      <h1 class="reveal font-heading font-extrabold text-5xl md:text-7xl lg:text-[120px] leading-[0.92] tracking-tight mb-6" style="animation-delay: 0.3s;">
+        <span class="block text-text-primary">Turn every</span>
+        <span class="block gradient-text">green act</span>
+        <span class="block text-text-primary">into impact.</span>
+      </h1>
+      <p class="reveal text-text-secondary font-body text-base md:text-lg max-w-lg mx-auto mb-10" style="animation-delay: 0.5s;">One app for India — measure your carbon footprint, complete daily missions, climb leaderboards, and drive community change. Together.</p>
+      <div class="reveal flex flex-wrap justify-center gap-4 mb-16" style="animation-delay: 0.7s;">
+        <a href="#" class="bg-accent text-bg font-heading font-bold px-8 py-4 rounded-full btn-glow">Download App</a>
+        <a href="#features" class="border border-border text-text-secondary font-body px-8 py-4 rounded-full hover:border-accent/50 hover:text-text-primary transition">See How It Works ↓</a>
+      </div>
+      <div class="reveal grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-0 md:flex items-center justify-center mt-16" style="animation-delay: 0.9s;">
+        <div class="flex flex-col items-center md:flex-row md:gap-4">
+          <span class="counter font-mono text-3xl text-accent" data-target="10000">0</span>
+          <span class="text-[11px] text-text-muted uppercase tracking-wider mt-1 md:mt-0">kg CO₂ tracked · Users measuring impact</span>
+        </div>
+        <div class="section-line hidden md:block bg-border"></div>
+        <div class="flex flex-col items-center md:flex-row md:gap-4">
+          <span class="counter font-mono text-3xl text-accent" data-target="20">0</span>
+          <span class="text-[11px] text-text-muted uppercase tracking-wider mt-1 md:mt-0">eco missions · Across 5 categories</span>
+        </div>
+        <div class="section-line hidden md:block bg-border"></div>
+        <div class="flex flex-col items-center md:flex-row md:gap-4">
+          <span class="font-mono text-3xl text-accent">500 kg</span>
+          <span class="text-[11px] text-text-muted uppercase tracking-wider mt-1 md:mt-0">community challenges · Collaborative goals</span>
+        </div>
+        <div class="section-line hidden md:block bg-border"></div>
+        <div class="flex flex-col items-center md:flex-row md:gap-4">
+          <span class="font-mono text-3xl text-accent">India-first 🇮🇳</span>
+          <span class="text-[11px] text-text-muted uppercase tracking-wider mt-1 md:mt-0">CEA v18 emission data</span>
+        </div>
+      </div>
+    </div>
+    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2">
+      <span class="text-[10px] text-text-muted uppercase tracking-widest">Scroll</span>
+      <div class="w-px h-12 bg-gradient-to-b from-border to-transparent opacity-70 animate-pulse"></div>
+    </div>
+  </section>
+
+  <!-- TICKER -->
+  <section class="w-full bg-surface border-y border-border py-4">
+    <div class="ticker-wrap">
+      <div class="ticker-inner">
+        <span class="font-heading font-semibold text-sm text-text-secondary px-6">🌿 India-First Calculator</span>
+        <span class="text-accent px-2">·</span>
+        <span class="font-heading font-semibold text-sm text-text-secondary px-6">📊 Real Leaderboards</span>
+        <span class="text-accent px-2">·</span>
+        <span class="font-heading font-semibold text-sm text-text-secondary px-6">🏆 Badge Milestones</span>
+        <span class="text-accent px-2">·</span>
+        <span class="font-heading font-semibold text-sm text-text-secondary px-6">🤝 Community Challenges</span>
+        <span class="text-accent px-2">·</span>
+        <span class="font-heading font-semibold text-sm text-text-secondary px-6">📱 Share Your Impact</span>
+        <span class="text-accent px-2">·</span>
+        <span class="font-heading font-semibold text-sm text-text-secondary px-6">⚡ Carbon Offsets</span>
+        <span class="text-accent px-2">·</span>
+        <span class="font-heading font-semibold text-sm text-text-secondary px-6">🔥 Daily Streaks</span>
+        <span class="text-accent px-2">·</span>
+        <span class="font-heading font-semibold text-sm text-text-secondary px-6">🗺️ State Grid Factors</span>
+        <span class="text-accent px-2">·</span>
+        <span class="font-heading font-semibold text-sm text-text-secondary px-6">🌍 CO₂ Missions</span>
+        <span class="text-accent px-2">·</span>
+        <span class="font-heading font-semibold text-sm text-text-secondary px-6">🌿 India-First Calculator</span>
+        <span class="text-accent px-2">·</span>
+        <span class="font-heading font-semibold text-sm text-text-secondary px-6">📊 Real Leaderboards</span>
+        <span class="text-accent px-2">·</span>
+        <span class="font-heading font-semibold text-sm text-text-secondary px-6">🏆 Badge Milestones</span>
+        <span class="text-accent px-2">·</span>
+        <span class="font-heading font-semibold text-sm text-text-secondary px-6">🤝 Community Challenges</span>
+        <span class="text-accent px-2">·</span>
+        <span class="font-heading font-semibold text-sm text-text-secondary px-6">📱 Share Your Impact</span>
+        <span class="text-accent px-2">·</span>
+        <span class="font-heading font-semibold text-sm text-text-secondary px-6">⚡ Carbon Offsets</span>
+        <span class="text-accent px-2">·</span>
+        <span class="font-heading font-semibold text-sm text-text-secondary px-6">🔥 Daily Streaks</span>
+        <span class="text-accent px-2">·</span>
+        <span class="font-heading font-semibold text-sm text-text-secondary px-6">🗺️ State Grid Factors</span>
+        <span class="text-accent px-2">·</span>
+        <span class="font-heading font-semibold text-sm text-text-secondary px-6">🌍 CO₂ Missions</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEM / SOLUTION -->
+  <section id="features" class="py-28 px-4 md:px-8 max-w-6xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-[55%_45%] gap-16 items-start">
+      <div>
+        <div class="flex items-center gap-4 mb-6">
+          <div class="w-6 h-24 bg-accent rounded"></div>
+          <span class="text-accent text-xs font-heading uppercase tracking-widest">THE PROBLEM</span>
+        </div>
+        <h2 class="font-heading font-extrabold text-4xl md:text-5xl text-text-primary tracking-tight mb-12 reveal">People want to act on climate.<br>Nobody shows them how.</h2>
+        <div class="space-y-6">
+          <div class="reveal card-hover bg-surface border border-border rounded-2xl p-6">
+            <div class="flex gap-4">
+              <div class="w-12 h-12 rounded-xl bg-surface2 flex items-center justify-center text-2xl flex-shrink-0">🤷</div>
+              <div>
+                <h3 class="font-heading font-bold text-base text-text-primary mb-2">No visibility</h3>
+                <p class="text-sm text-text-secondary">People have no idea what their actual carbon footprint is or which daily choices matter most.</p>
+              </div>
+            </div>
+          </div>
+          <div class="reveal card-hover bg-surface border border-border rounded-2xl p-6 reveal-delay-1">
+            <div class="flex gap-4">
+              <div class="w-12 h-12 rounded-xl bg-surface2 flex items-center justify-center text-2xl flex-shrink-0">📉</div>
+              <div>
+                <h3 class="font-heading font-bold text-base text-text-primary mb-2">No motivation</h3>
+                <p class="text-sm text-text-secondary">Without streaks, points, or community pressure, good intentions fade after day one.</p>
+              </div>
+            </div>
+          </div>
+          <div class="reveal card-hover bg-surface border border-border rounded-2xl p-6 reveal-delay-2">
+            <div class="flex gap-4">
+              <div class="w-12 h-12 rounded-xl bg-surface2 flex items-center justify-center text-2xl flex-shrink-0">🏝️</div>
+              <div>
+                <h3 class="font-heading font-bold text-base text-text-primary mb-2">No togetherness</h3>
+                <p class="text-sm text-text-secondary">Individual action feels futile. Without a collective layer, change doesn't feel real.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="reveal card-hover bg-surface border border-border rounded-3xl p-10 relative overflow-hidden">
+        <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent to-transparent"></div>
+        <h2 class="font-heading font-extrabold text-4xl text-text-primary mb-4"><span class="text-accent">EcoAct</span><br>fixes all three.</h2>
+        <p class="text-text-secondary font-body text-base leading-7 mb-8">One India-first app: measure your footprint with state-accurate data, reduce it through gamified missions, compete on real leaderboards, and drive impact with your college, city, or company.</p>
+        <div class="flex flex-wrap gap-2">
+          <span class="bg-accent/10 border border-accent/20 text-accent text-xs font-semibold rounded-full px-3 py-1.5">📏 Measure</span>
+          <span class="bg-accent/10 border border-accent/20 text-accent text-xs font-semibold rounded-full px-3 py-1.5">🎯 Act</span>
+          <span class="bg-accent/10 border border-accent/20 text-accent text-xs font-semibold rounded-full px-3 py-1.5">🏆 Compete</span>
+          <span class="bg-accent/10 border border-accent/20 text-accent text-xs font-semibold rounded-full px-3 py-1.5">🤝 Collaborate</span>
+          <span class="bg-accent/10 border border-accent/20 text-accent text-xs font-semibold rounded-full px-3 py-1.5">📤 Share</span>
+          <span class="bg-accent/10 border border-accent/20 text-accent text-xs font-semibold rounded-full px-3 py-1.5">♻️ Offset</span>
+        </div>
+        <div class="absolute bottom-0 right-0 w-96 h-96 bg-[radial-gradient(circle,rgba(0,200,150,0.06),transparent)] pointer-events-none"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES GRID -->
+  <section class="bg-surface border-y border-border">
+    <div class="max-w-6xl mx-auto px-4 md:px-8 pt-24 pb-16">
+      <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-16">
+        <div>
+          <span class="text-accent text-xs font-heading uppercase tracking-widest">WHAT ECOACT DOES</span>
+          <h2 class="font-heading font-extrabold text-4xl md:text-5xl text-text-primary mt-2 tracking-tight">Every feature has<br>a reason to exist.</h2>
+        </div>
+        <p class="text-text-secondary font-body text-sm max-w-xs">Built around one insight: people act when they can see impact, earn rewards, and feel part of something bigger.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-border rounded-3xl overflow-hidden border border-border">
+        <div class="reveal card-hover bg-surface p-10 group">
+          <span class="font-mono text-[11px] text-text-muted">01</span>
+          <div class="text-4xl my-5 drop-shadow-[0_0_20px_rgba(0,200,150,0.3)]">🧮</div>
+          <h3 class="font-heading font-bold text-lg text-text-primary mt-5 mb-3 tracking-tight">State-accurate footprint in 10 steps.</h3>
+          <p class="text-sm text-text-secondary leading-relaxed">State-wise electricity grid factors (CEA v18), Indian transport modes (auto-rickshaw, e-rickshaw, metro by city), and diet calibrated for Indian eating patterns. Not a generic global calculator.</p>
+          <span class="inline-block mt-6 text-accent text-[10px] uppercase tracking-wide">10 QUESTIONS → ANNUAL CO₂ →</span>
+        </div>
+        <div class="reveal card-hover bg-surface p-10 group reveal-delay-1">
+          <span class="font-mono text-[11px] text-text-muted">02</span>
+          <div class="text-4xl my-5">🎯</div>
+          <h3 class="font-heading font-bold text-lg text-text-primary mt-5 mb-3 tracking-tight">Daily green actions with real rewards.</h3>
+          <p class="text-sm text-text-secondary leading-relaxed">20+ missions across Transport, Food, Energy, Shopping, and Water. Each completion earns CO₂ saved + points. Streaks multiply your rewards. Badges unlock at milestones.</p>
+          <span class="inline-block mt-6 text-accent text-[10px] uppercase tracking-wide">POINTS · STREAKS · BADGES →</span>
+        </div>
+        <div class="reveal card-hover bg-surface p-10 group reveal-delay-2">
+          <span class="font-mono text-[11px] text-text-muted">03</span>
+          <div class="text-4xl my-5">🏆</div>
+          <h3 class="font-heading font-bold text-lg text-text-primary mt-5 mb-3 tracking-tight">Live rankings. No dummy data.</h3>
+          <p class="text-sm text-text-secondary leading-relaxed">Global, community, and weekly leaderboards pulled live from the database. Your rank appears on the Home screen in real time. Every position is earned.</p>
+          <span class="inline-block mt-6 text-accent text-[10px] uppercase tracking-wide">GLOBAL · COMMUNITY · WEEKLY →</span>
+        </div>
+        <div class="reveal card-hover bg-surface p-10 group reveal-delay-3">
+          <span class="font-mono text-[11px] text-text-muted">04</span>
+          <div class="text-4xl my-5">🤝</div>
+          <h3 class="font-heading font-bold text-lg text-text-primary mt-5 mb-3 tracking-tight">Save CO₂ together or fail together.</h3>
+          <p class="text-sm text-text-secondary leading-relaxed">Join your college, city, or company. Run time-bound community challenges (e.g. 'Save 500 kg CO₂ this week'). Every mission you complete contributes. Live activity feed shows who's acting.</p>
+          <span class="inline-block mt-6 text-accent text-[10px] uppercase tracking-wide">CHALLENGES · FEED · STATS →</span>
+        </div>
+        <div class="reveal card-hover bg-surface p-10 group reveal-delay-4">
+          <span class="font-mono text-[11px] text-text-muted">05</span>
+          <div class="text-4xl my-5">📅</div>
+          <h3 class="font-heading font-bold text-lg text-text-primary mt-5 mb-3 tracking-tight">Weekly and monthly goals that reset.</h3>
+          <p class="text-sm text-text-secondary leading-relaxed">'Save 50 kg CO₂ this month.' 'Complete 10 missions this week.' Goals reset automatically each period. Hit them for bonus points and exclusive badges. Always a reason to come back.</p>
+          <span class="inline-block mt-6 text-accent text-[10px] uppercase tracking-wide">WEEKLY · MONTHLY · BONUS →</span>
+        </div>
+        <div class="reveal card-hover bg-surface p-10 group reveal-delay-5">
+          <span class="font-mono text-[11px] text-text-muted">06</span>
+          <div class="text-4xl my-5">📤</div>
+          <h3 class="font-heading font-bold text-lg text-text-primary mt-5 mb-3 tracking-tight">Rewards that travel outside the app.</h3>
+          <p class="text-sm text-text-secondary leading-relaxed">Earned a badge? Hit a community challenge? Improved your footprint? Share a branded card to Instagram Stories, WhatsApp, or save to camera roll. Growth built into the reward loop.</p>
+          <span class="inline-block mt-6 text-accent text-[10px] uppercase tracking-wide">INSTAGRAM · WHATSAPP · SAVE →</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WHY INDIA -->
+  <section id="why-india" class="max-w-6xl mx-auto py-28 px-4 md:px-8">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-start">
+      <div>
+        <span class="text-accent text-xs font-heading uppercase tracking-widest">WHY INDIA FIRST</span>
+        <h2 class="font-heading font-extrabold text-4xl md:text-5xl text-text-primary mt-4 mb-10 tracking-tight">Not global defaults.<br>India's actual data.</h2>
+        <p class="text-text-secondary text-[17px] leading-7 mb-10">Generic carbon calculators use UK or US emission factors. EcoAct uses India-specific data from authoritative sources: CEA, MoRTH, ICCT, and FAO. Your footprint reflects your actual grid, your city's transport, and your diet.</p>
+        <div class="space-y-6">
+          <div class="reveal card-hover bg-surface border border-border rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4"><span class="text-2xl">⚡</span><h3 class="font-heading font-bold text-base text-text-primary">State-wise Grid Factors (CEA v18)</h3></div>
+            <p class="text-sm text-text-secondary mb-4">20 Indian states, each with their own kg CO₂/kWh value. Karnataka: 0.58 · Maharashtra: 0.76 · Chhattisgarh: 1.12. Your state matters.</p>
+            <div class="space-y-2 mb-2">
+              <div><div class="flex justify-between text-xs mb-1"><span>Kerala: 0.42 kg/kWh</span><span>37%</span></div><div class="h-1.5 rounded-full bg-surface2 overflow-hidden"><div class="progress-fill h-full rounded-full bg-gradient-to-r from-accent to-primary-light w-[37%]" style="--target-width: 37%;"></div></div></div>
+              <div><div class="flex justify-between text-xs mb-1"><span>Maharashtra: 0.76 kg/kWh</span><span>68%</span></div><div class="h-1.5 rounded-full bg-surface2 overflow-hidden"><div class="progress-fill h-full rounded-full bg-gradient-to-r from-accent to-primary-light w-[68%]" style="--target-width: 68%;"></div></div></div>
+              <div><div class="flex justify-between text-xs mb-1"><span>Chhattisgarh: 1.12 kg/kWh</span><span>100%</span></div><div class="h-1.5 rounded-full bg-surface2 overflow-hidden"><div class="progress-fill h-full rounded-full bg-gradient-to-r from-accent to-primary-light w-full" style="--target-width: 100%;"></div></div></div>
+            </div>
+            <p class="font-mono text-[10px] text-text-muted">Source: CEA CO₂ Baseline Database v18, 2023</p>
+          </div>
+          <div class="reveal card-hover bg-surface border border-border rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4"><span class="text-2xl">🛺</span><h3 class="font-heading font-bold text-base text-text-primary">Indian Transport Modes</h3></div>
+            <p class="text-sm text-text-secondary mb-4">Auto-rickshaw (CNG + petrol), e-rickshaw, metro by city (Delhi, Bangalore, Mumbai), Indian Railways, two-wheelers. Not just cars.</p>
+            <div class="flex flex-wrap gap-2">
+              <span class="bg-surface2 border border-border text-text-muted text-xs font-mono rounded-full px-3 py-1">Auto CNG</span>
+              <span class="bg-surface2 border border-border text-text-muted text-xs font-mono rounded-full px-3 py-1">Auto Petrol</span>
+              <span class="bg-surface2 border border-border text-text-muted text-xs font-mono rounded-full px-3 py-1">E-Rickshaw</span>
+              <span class="bg-surface2 border border-border text-text-muted text-xs font-mono rounded-full px-3 py-1">Delhi Metro</span>
+              <span class="bg-surface2 border border-border text-text-muted text-xs font-mono rounded-full px-3 py-1">IR Rail</span>
+              <span class="bg-surface2 border border-border text-text-muted text-xs font-mono rounded-full px-3 py-1">EV Car</span>
+            </div>
+          </div>
+          <div class="reveal card-hover bg-surface border border-border rounded-2xl p-6">
+            <div class="flex items-center gap-3 mb-4"><span class="text-2xl">🥗</span><h3 class="font-heading font-bold text-base text-text-primary">India-Calibrated Diet Footprints</h3></div>
+            <p class="text-sm text-text-secondary">6 diet types from Vegan (local) to Non-veg (daily). Ranges from 800 kg CO₂/year to 3,200 kg CO₂/year, calibrated with FAO India data.</p>
+            <div class="mt-4 h-2 rounded-full bg-surface2 overflow-hidden flex"><div class="bg-accent w-[25%] rounded-l-full"></div><div class="bg-primary-light w-[25%]"></div><div class="bg-accent-warm/50 w-[25%]"></div><div class="bg-accent-warm w-[25%] rounded-r-full"></div></div>
+            <div class="flex justify-between text-[10px] text-text-muted mt-2"><span>800</span><span>3,200 kg/year</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="reveal bg-surface border border-border rounded-3xl p-8">
+        <h3 class="font-heading font-bold text-base text-text-primary mb-1">Annual CO₂ by State Grid</h3>
+        <p class="font-mono text-[11px] text-text-muted mb-6">kg CO₂/kWh · CEA v18 · 2023</p>
+        <div class="grid grid-cols-4 gap-3">
+          <div class="bg-surface2 border border-border rounded-xl p-3 text-center"><span class="block text-[10px] text-text-muted font-mono uppercase">KL</span><span class="font-mono text-base text-accent">0.42</span></div>
+          <div class="bg-surface2 border border-border rounded-xl p-3 text-center"><span class="block text-[10px] text-text-muted font-mono uppercase">KA</span><span class="font-mono text-base text-accent">0.58</span></div>
+          <div class="bg-surface2 border border-border rounded-xl p-3 text-center"><span class="block text-[10px] text-text-muted font-mono uppercase">GJ</span><span class="font-mono text-base text-primary-light">0.79</span></div>
+          <div class="bg-surface2 border border-border rounded-xl p-3 text-center"><span class="block text-[10px] text-text-muted font-mono uppercase">MH</span><span class="font-mono text-base text-primary-light">0.76</span></div>
+          <div class="bg-surface2 border border-border rounded-xl p-3 text-center"><span class="block text-[10px] text-text-muted font-mono uppercase">TN</span><span class="font-mono text-base text-primary-light">0.61</span></div>
+          <div class="bg-surface2 border border-border rounded-xl p-3 text-center"><span class="block text-[10px] text-text-muted font-mono uppercase">TS</span><span class="font-mono text-base text-primary-light">0.74</span></div>
+          <div class="bg-surface2 border border-border rounded-xl p-3 text-center"><span class="block text-[10px] text-text-muted font-mono uppercase">DL</span><span class="font-mono text-base text-accent-warm">0.82</span></div>
+          <div class="bg-surface2 border border-border rounded-xl p-3 text-center"><span class="block text-[10px] text-text-muted font-mono uppercase">AP</span><span class="font-mono text-base text-primary-light">0.71</span></div>
+          <div class="bg-surface2 border border-border rounded-xl p-3 text-center"><span class="block text-[10px] text-text-muted font-mono uppercase">PB</span><span class="font-mono text-base text-primary-light">0.65</span></div>
+          <div class="bg-surface2 border border-border rounded-xl p-3 text-center"><span class="block text-[10px] text-text-muted font-mono uppercase">HR</span><span class="font-mono text-base text-accent-warm">0.88</span></div>
+          <div class="bg-surface2 border border-border rounded-xl p-3 text-center"><span class="block text-[10px] text-text-muted font-mono uppercase">WB</span><span class="font-mono text-base text-accent-warm">0.89</span></div>
+          <div class="bg-surface2 border border-border rounded-xl p-3 text-center"><span class="block text-[10px] text-text-muted font-mono uppercase">MP</span><span class="font-mono text-base text-accent-warm">0.96</span></div>
+          <div class="bg-surface2 border border-border rounded-xl p-3 text-center"><span class="block text-[10px] text-text-muted font-mono uppercase">RJ</span><span class="font-mono text-base text-accent-warm">0.91</span></div>
+          <div class="bg-surface2 border border-border rounded-xl p-3 text-center"><span class="block text-[10px] text-text-muted font-mono uppercase">UP</span><span class="font-mono text-base text-red-400/90">1.02</span></div>
+          <div class="bg-surface2 border border-border rounded-xl p-3 text-center"><span class="block text-[10px] text-text-muted font-mono uppercase">JH</span><span class="font-mono text-base text-red-400/90">1.08</span></div>
+          <div class="bg-surface2 border border-border rounded-xl p-3 text-center"><span class="block text-[10px] text-text-muted font-mono uppercase">CG</span><span class="font-mono text-base text-red-400/90">1.12</span></div>
+        </div>
+        <div class="flex gap-4 mt-4 justify-center text-[10px] text-text-muted">
+          <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-accent"></span> Low</span>
+          <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-accent-warm"></span> Medium</span>
+          <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-400/80"></span> High</span>
+        </div>
+        <p class="text-accent font-heading font-semibold text-sm mt-6">✓ Using your state's exact grid factor since 2023.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMMUNITY -->
+  <section id="community" class="bg-surface border-y border-border py-28">
+    <div class="max-w-2xl mx-auto text-center mb-16 px-4">
+      <span class="text-accent text-xs font-heading uppercase tracking-widest">BUILT FOR COMMUNITIES</span>
+      <h2 class="font-heading font-extrabold text-4xl md:text-5xl text-text-primary mt-2 mb-4 tracking-tight">Individual actions.<br>Collective momentum.</h2>
+      <p class="text-text-secondary">Join your college, company, or city. Run community CO₂ challenges with live progress. See who's acting in real time.</p>
+    </div>
+    <div class="max-w-6xl mx-auto px-4 md:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="reveal card-hover bg-surface border border-border rounded-2xl p-6 relative">
+        <span class="absolute top-4 right-4 bg-accent/20 text-accent text-[10px] font-bold uppercase px-2 py-1 rounded-full">ACTIVE</span>
+        <span class="text-accent text-[11px] font-heading uppercase tracking-wider">🏁 ACTIVE CHALLENGE</span>
+        <h3 class="font-heading font-bold text-xl text-text-primary mt-2 mb-1">Save 500 kg CO₂ This Week</h3>
+        <p class="text-text-muted text-sm mb-6">IIT Bombay Community · 3 days left</p>
+        <div class="flex justify-end text-text-secondary font-mono text-sm mb-2">310 / 500 kg</div>
+        <div class="h-3 rounded-full bg-surface2 overflow-hidden mb-2">
+          <div id="challenge-bar" class="progress-fill h-full rounded-full bg-gradient-to-r from-accent to-primary-light" style="--target-width: 62%; width: 62%;"></div>
+        </div>
+        <p id="challenge-pct" class="text-text-muted text-xs">62% complete</p>
+        <p class="text-text-secondary text-sm mt-4">👥 24 contributors</p>
+      </div>
+      <div class="reveal card-hover bg-surface border border-border rounded-2xl p-6 reveal-delay-1">
+        <span class="text-accent text-[11px] font-heading uppercase tracking-wider">📡 LIVE ACTIVITY</span>
+        <div class="mt-4 space-y-3">
+          <div class="border-b border-border pb-3 flex justify-between items-start gap-4">
+            <div><p class="text-sm font-semibold text-text-primary">Priya completed Bike Instead of Car</p><p class="text-[11px] text-text-muted">Saved 1.05 kg CO₂ · Transport</p></div>
+            <span class="font-mono text-[11px] text-text-muted flex-shrink-0">2m</span>
+          </div>
+          <div class="border-b border-border pb-3 flex justify-between items-start gap-4">
+            <div><p class="text-sm font-semibold text-text-primary">Rahul joined the community</p><p class="text-[11px] text-text-muted">Welcome to the team!</p></div>
+            <span class="font-mono text-[11px] text-text-muted flex-shrink-0">15m</span>
+          </div>
+          <div class="border-b border-border pb-3 flex justify-between items-start gap-4">
+            <div><p class="text-sm font-semibold text-text-primary">Aisha earned Climate Hero badge</p><p class="text-[11px] text-text-muted">Milestone unlocked</p></div>
+            <span class="font-mono text-[11px] text-text-muted flex-shrink-0">1h</span>
+          </div>
+          <div class="pb-0 flex justify-between items-start gap-4">
+            <div><p class="text-sm font-semibold text-text-primary">Community goal reached!</p><p class="text-[11px] text-text-muted">500 kg CO₂ saved together</p></div>
+            <span class="font-mono text-[11px] text-text-muted flex-shrink-0">2h</span>
+          </div>
+        </div>
+      </div>
+      <div class="reveal card-hover bg-surface border border-border rounded-2xl p-6 reveal-delay-2">
+        <span class="text-accent text-[11px] font-heading uppercase tracking-wider">📊 COMMUNITY IMPACT</span>
+        <p class="font-heading font-extrabold text-5xl text-accent mt-2">1,847</p>
+        <p class="text-text-secondary text-sm mb-6">kg CO₂ saved · All time · IIT Bombay</p>
+        <div class="space-y-3 text-sm">
+          <div class="flex justify-between"><span class="text-text-secondary">This month</span><span class="text-text-primary">312 kg <span class="text-accent">+18%</span></span></div>
+          <div class="flex justify-between"><span class="text-text-secondary">Per member avg</span><span class="text-text-primary">2.4 kg</span></div>
+          <div class="flex justify-between"><span class="text-text-secondary">Active contributors</span><span class="text-text-primary">24</span></div>
+        </div>
+        <p class="text-text-muted text-xs mt-6 mb-2">This Week's Activity</p>
+        <div class="flex items-end gap-1 h-12">
+          <div class="flex-1 bg-accent/60 rounded-t" style="height: 40%;"></div>
+          <div class="flex-1 bg-accent rounded-t" style="height: 70%;"></div>
+          <div class="flex-1 bg-accent/80 rounded-t" style="height: 55%;"></div>
+          <div class="flex-1 bg-accent rounded-t" style="height: 90%;"></div>
+          <div class="flex-1 bg-accent/70 rounded-t" style="height: 65%;"></div>
+          <div class="flex-1 bg-accent rounded-t" style="height: 85%;"></div>
+          <div class="flex-1 bg-accent/90 rounded-t" style="height: 75%;"></div>
+        </div>
+        <div class="flex justify-between text-[10px] text-text-muted mt-1"><span>Mon</span><span>Sun</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOURNEY -->
+  <section class="max-w-4xl mx-auto py-24 px-4 md:px-8">
+    <div class="text-center mb-16">
+      <span class="text-accent text-xs font-heading uppercase tracking-widest">THE JOURNEY</span>
+      <h2 class="font-heading font-extrabold text-4xl md:text-5xl text-text-primary mt-2 tracking-tight">Measure. Act. Compete.<br>Repeat.</h2>
+    </div>
+    <div class="relative pl-8 border-l-2 border-dashed border-border space-y-12">
+      <div class="reveal relative">
+        <div class="absolute -left-[41px] top-0 w-3 h-3 rounded-full bg-accent shadow-[0_0_20px_rgba(0,200,150,0.5)]"></div>
+        <div class="text-3xl mb-2">🧮</div>
+        <h3 class="font-heading font-bold text-xl text-text-primary mb-2">Calculate</h3>
+        <p class="text-text-secondary text-sm leading-relaxed mb-2">Answer 10 India-specific questions. Get your annual CO₂ footprint with a breakdown by transport, food, energy, and shopping. See how you compare to India's average (1,700 kg/year).</p>
+        <span class="text-text-muted text-xs">Takes 2 minutes</span>
+      </div>
+      <div class="reveal relative">
+        <div class="absolute -left-[41px] top-0 w-3 h-3 rounded-full bg-accent shadow-[0_0_20px_rgba(0,200,150,0.5)]"></div>
+        <div class="text-3xl mb-2">🎯</div>
+        <h3 class="font-heading font-bold text-xl text-text-primary mb-2">Mission</h3>
+        <p class="text-text-secondary text-sm leading-relaxed mb-2">Browse 20+ eco missions by category. Complete 'Bike Instead of Car' for 1.05 kg CO₂ saved and 50 pts. Build streaks. Earn badges. Every action counts toward your community challenge.</p>
+        <span class="text-text-muted text-xs">Daily habit builder</span>
+      </div>
+      <div class="reveal relative">
+        <div class="absolute -left-[41px] top-0 w-3 h-3 rounded-full bg-accent shadow-[0_0_20px_rgba(0,200,150,0.5)]"></div>
+        <div class="text-3xl mb-2">🏆</div>
+        <h3 class="font-heading font-bold text-xl text-text-primary mb-2">Compete</h3>
+        <p class="text-text-secondary text-sm leading-relaxed mb-2">Watch your rank rise on the global, community, and weekly leaderboards. Your rank appears on your Home screen — updated in real time from the database.</p>
+        <span class="text-text-muted text-xs">Real rankings, real data</span>
+      </div>
+      <div class="reveal relative">
+        <div class="absolute -left-[41px] top-0 w-3 h-3 rounded-full bg-accent shadow-[0_0_20px_rgba(0,200,150,0.5)]"></div>
+        <div class="text-3xl mb-2">📤</div>
+        <h3 class="font-heading font-bold text-xl text-text-primary mb-2">Share</h3>
+        <p class="text-text-secondary text-sm leading-relaxed mb-2">Earn a badge? Hit a milestone? Share a branded card to Instagram or WhatsApp. Your impact travels beyond the app. Others join. The community grows.</p>
+        <span class="text-text-muted text-xs">Built-in growth loop</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- OFFSET TEASER -->
+  <section class="max-w-5xl mx-auto py-20 px-4 md:px-8">
+    <div class="reveal bg-surface border border-border rounded-3xl p-8 md:p-12 relative overflow-hidden">
+      <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent to-transparent"></div>
+      <div class="absolute top-1/2 right-0 w-96 h-96 bg-[radial-gradient(circle,rgba(0,200,150,0.06),transparent)] -translate-y-1/2 pointer-events-none"></div>
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 relative">
+        <div>
+          <span class="text-accent text-xs font-heading uppercase tracking-widest">CLOSE THE LOOP</span>
+          <h2 class="font-heading font-extrabold text-4xl text-text-primary mt-2 mb-4">Reduce first.<br>Then offset the rest.</h2>
+          <p class="text-text-secondary text-base leading-7 mb-8">After calculating your footprint, EcoAct shows you how much it costs to offset it with verified providers — Gold Standard, Verra, ClimatePartner India, and Sankalptaru. Then it sends you to missions first.</p>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center border-b border-border py-3"><div><span class="font-heading font-semibold text-sm text-text-primary">Gold Standard</span><span class="block font-mono text-[11px] text-text-muted">Gold Standard Certified</span></div></div>
+            <div class="flex justify-between items-center border-b border-border py-3"><div><span class="font-heading font-semibold text-sm text-text-primary">Verra (VCS)</span><span class="block font-mono text-[11px] text-text-muted">Verra VCS Certified</span></div></div>
+            <div class="flex justify-between items-center border-b border-border py-3"><div><span class="font-heading font-semibold text-sm text-text-primary">ClimatePartner India</span><span class="block font-mono text-[11px] text-text-muted">India-Focused · Gold Standard</span></div><span class="text-accent text-xs bg-accent/10 px-2 py-1 rounded">India 🇮🇳</span></div>
+            <div class="flex justify-between items-center border-b border-border py-3"><div><span class="font-heading font-semibold text-sm text-text-primary">Sankalptaru</span><span class="block font-mono text-[11px] text-text-muted">India Reforestation · Plan Vivo</span></div><span class="text-accent text-xs bg-accent/10 px-2 py-1 rounded">India 🇮🇳</span></div>
+          </div>
+        </div>
+        <div class="bg-accent/10 border border-accent/30 rounded-2xl p-8 text-center flex flex-col justify-center">
+          <p class="text-text-primary font-heading font-semibold mb-2">Offset your entire footprint</p>
+          <p class="font-heading font-extrabold text-3xl text-accent">from ₹1,557 / year</p>
+          <p class="font-mono text-sm text-text-secondary mt-2">(Sankalptaru reforestation, Plan Vivo)</p>
+          <p class="font-mono text-sm text-text-secondary mt-4">= planting 83 trees 🌳</p>
+          <p class="text-text-muted text-sm italic mt-4">But reduce first → explore missions</p>
+        </div>
+      </div>
+      <p class="text-text-muted text-[11px] italic text-center mt-8">EcoAct does not receive commission from offset providers. These are independent verified programs.</p>
+    </div>
+  </section>
+
+  <!-- TECH STACK -->
+  <section id="tech-stack" class="max-w-5xl mx-auto py-24 px-4 md:px-8">
+    <span class="text-accent text-xs font-heading uppercase tracking-widest">BUILT WITH CARE</span>
+    <h2 class="font-heading font-extrabold text-4xl md:text-5xl text-text-primary mt-2 mb-12 tracking-tight">Production-grade.<br>Hackathon-hardened.</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-8">
+      <div>
+        <h3 class="font-heading font-bold text-sm text-text-muted mb-4">Frontend</h3>
+        <div class="flex flex-wrap gap-2">
+          <span class="bg-surface2 border border-border rounded-full px-4 py-2 font-mono text-xs text-text-secondary">React Native (Expo)</span>
+          <span class="bg-surface2 border border-border rounded-full px-4 py-2 font-mono text-xs text-text-secondary">TypeScript</span>
+          <span class="bg-surface2 border border-border rounded-full px-4 py-2 font-mono text-xs text-text-secondary">React Navigation v6</span>
+          <span class="bg-surface2 border border-border rounded-full px-4 py-2 font-mono text-xs text-text-secondary">Zustand</span>
+          <span class="bg-surface2 border border-border rounded-full px-4 py-2 font-mono text-xs text-text-secondary">Reanimated 3</span>
+        </div>
+      </div>
+      <div>
+        <h3 class="font-heading font-bold text-sm text-text-muted mb-4">Backend</h3>
+        <div class="flex flex-wrap gap-2">
+          <span class="bg-surface2 border border-border rounded-full px-4 py-2 font-mono text-xs text-text-secondary">Node.js + Express</span>
+          <span class="bg-surface2 border border-border rounded-full px-4 py-2 font-mono text-xs text-text-secondary">MongoDB + Mongoose</span>
+          <span class="bg-surface2 border border-border rounded-full px-4 py-2 font-mono text-xs text-text-secondary">JWT (access + refresh)</span>
+          <span class="bg-surface2 border border-border rounded-full px-4 py-2 font-mono text-xs text-text-secondary">Google OAuth (id_token)</span>
+          <span class="bg-surface2 border border-border rounded-full px-4 py-2 font-mono text-xs text-text-secondary">State-wise emission factors</span>
+          <span class="bg-surface2 border border-border rounded-full px-4 py-2 font-mono text-xs text-text-secondary">Aggregation pipelines</span>
+        </div>
+      </div>
+    </div>
+    <div class="reveal bg-surface border border-border rounded-2xl p-6 flex flex-wrap items-center justify-center gap-8">
+      <div class="text-center"><p class="font-mono text-lg text-accent">20 factors</p><p class="font-mono text-[11px] text-text-muted">State grid CEA v18</p></div>
+      <div class="text-center"><p class="font-mono text-lg text-accent">Hourly cron</p><p class="font-mono text-[11px] text-text-muted">Challenge expiry</p></div>
+      <div class="text-center"><p class="font-mono text-lg text-accent">Live aggregation</p><p class="font-mono text-[11px] text-text-muted">Leaderboard</p></div>
+      <div class="text-center"><p class="font-mono text-lg text-accent">Auto-reset</p><p class="font-mono text-[11px] text-text-muted">Milestones weekly/monthly</p></div>
+    </div>
+  </section>
+
+  <!-- CTA HERO -->
+  <section class="bg-surface border-t border-border py-28 px-4">
+    <div class="text-center max-w-2xl mx-auto">
+      <span class="text-accent text-xs font-heading uppercase tracking-widest">READY TO ACT</span>
+      <h2 class="font-heading font-extrabold text-4xl md:text-6xl lg:text-[80px] text-text-primary mt-2 mb-6 tracking-tight">Your carbon footprint<br>doesn't measure itself.</h2>
+      <p class="text-text-secondary text-lg max-w-lg mx-auto mb-12">Join EcoAct. 10 minutes to your first footprint. 2 minutes to your first mission. Zero excuses.</p>
+      <div class="flex flex-wrap justify-center gap-4">
+        <a href="#" class="bg-accent text-bg font-heading font-bold px-10 py-5 rounded-full btn-glow text-lg">Download EcoAct</a>
+        <a href="#" class="border border-border text-text-secondary font-body px-10 py-5 rounded-full hover:border-accent/50 hover:text-text-primary transition text-lg">View on GitHub →</a>
+      </div>
+      <div class="flex flex-wrap justify-center gap-8 mt-12 text-text-muted text-sm">
+        <span class="flex items-center gap-2">🔒 Google Sign-In</span>
+        <span class="flex items-center gap-2">🇮🇳 India-First Data</span>
+        <span class="flex items-center gap-2">📖 Open Source</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="bg-bg border-t border-border py-12 px-4 md:px-8">
+    <div class="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-12">
+      <div class="col-span-2 md:col-span-1">
+        <p class="font-heading font-bold text-lg"><span class="text-text-primary">Eco</span><span class="text-accent">Act</span></p>
+        <p class="text-text-muted text-xs max-w-xs mt-3">India's carbon action app. Measure your footprint, complete missions, compete with your community, and share your impact.</p>
+        <p class="font-mono text-[11px] text-text-muted mt-4">Hackathon 2025 · India-First</p>
+      </div>
+      <div>
+        <p class="font-heading font-semibold text-sm text-text-primary mb-3">Product</p>
+        <a href="#features" class="block text-text-muted text-sm hover:text-text-secondary transition">Features</a>
+        <a href="#" class="block text-text-muted text-sm hover:text-text-secondary transition">Calculator</a>
+        <a href="#" class="block text-text-muted text-sm hover:text-text-secondary transition">Missions</a>
+        <a href="#" class="block text-text-muted text-sm hover:text-text-secondary transition">Leaderboard</a>
+        <a href="#community" class="block text-text-muted text-sm hover:text-text-secondary transition">Community</a>
+      </div>
+      <div>
+        <p class="font-heading font-semibold text-sm text-text-primary mb-3">Data</p>
+        <span class="block text-text-muted text-sm">CEA v18 Grid Factors</span>
+        <span class="block text-text-muted text-sm">MoRTH Transport</span>
+        <span class="block text-text-muted text-sm">FAO India Diet</span>
+      </div>
+      <div>
+        <p class="font-heading font-semibold text-sm text-text-primary mb-3">Stack</p>
+        <span class="block text-text-muted text-sm">React Native</span>
+        <span class="block text-text-muted text-sm">Node.js</span>
+        <span class="block text-text-muted text-sm">MongoDB</span>
+        <span class="block text-text-muted text-sm">Google Auth</span>
+      </div>
+    </div>
+    <div class="max-w-6xl mx-auto border-t border-border mt-8 pt-6 flex flex-col md:flex-row justify-between gap-4 text-text-muted text-xs">
+      <span>© 2025 EcoAct. Built for a better planet.</span>
+      <span>Made with 🌿 in India</span>
+    </div>
+  </footer>
+
+  <script>
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursor-ring');
+    let ringX = 0, ringY = 0, mouseX = 0, mouseY = 0;
+    document.addEventListener('mousemove', e => {
+      mouseX = e.clientX; mouseY = e.clientY;
+      cursor.style.left = mouseX + 'px';
+      cursor.style.top = mouseY + 'px';
+    });
+    function animateRing() {
+      ringX += (mouseX - ringX) * 0.12;
+      ringY += (mouseY - ringY) * 0.12;
+      ring.style.left = ringX + 'px';
+      ring.style.top = ringY + 'px';
+      requestAnimationFrame(animateRing);
+    }
+    animateRing();
+    document.querySelectorAll('a, button, .card-hover').forEach(el => {
+      el.addEventListener('mouseenter', () => { cursor.classList.add('hovered'); ring.classList.add('hovered'); });
+      el.addEventListener('mouseleave', () => { cursor.classList.remove('hovered'); ring.classList.remove('hovered'); });
+    });
+
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    reveals.forEach(el => observer.observe(el));
+
+    function animateCounter(el) {
+      const target = parseInt(el.dataset.target);
+      if (!target) return;
+      const duration = 2000;
+      const step = target / (duration / 16);
+      let current = 0;
+      const timer = setInterval(() => {
+        current += step;
+        if (current >= target) { current = target; clearInterval(timer); }
+        el.textContent = Math.floor(current).toLocaleString('en-IN');
+      }, 16);
+    }
+    const counterObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          animateCounter(entry.target);
+          counterObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.5 });
+    document.querySelectorAll('.counter').forEach(el => counterObserver.observe(el));
+
+    const barObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('animated');
+          barObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.3 });
+    document.querySelectorAll('.progress-fill').forEach(el => barObserver.observe(el));
+
+    const nav = document.getElementById('main-nav');
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 80) nav.classList.add('scrolled');
+      else nav.classList.remove('scrolled');
+    });
+
+    const hamburger = document.getElementById('hamburger');
+    const mobileNav = document.getElementById('mobile-nav');
+    hamburger.addEventListener('click', () => {
+      mobileNav.classList.toggle('open');
+      hamburger.classList.toggle('active');
+      document.body.style.overflow = mobileNav.classList.contains('open') ? 'hidden' : '';
+    });
+    document.querySelectorAll('#mobile-nav a').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileNav.classList.remove('open');
+        hamburger.classList.remove('active');
+        document.body.style.overflow = '';
+      });
+    });
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', e => {
+        const href = anchor.getAttribute('href');
+        if (href === '#') return;
+        e.preventDefault();
+        const target = document.querySelector(href);
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    });
+
+    setTimeout(() => {
+      const bar = document.getElementById('challenge-bar');
+      const label = document.getElementById('challenge-pct');
+      if (bar && label) {
+        bar.style.width = '63%';
+        label.textContent = '63% complete';
+      }
+    }, 4000);
+  </script>
+</body>
+</html>

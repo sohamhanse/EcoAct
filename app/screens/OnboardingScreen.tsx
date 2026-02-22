@@ -1,13 +1,13 @@
+import { COLORS } from "@/constants/colors";
+import { RADIUS } from "@/constants/radius";
+import { SPACING } from "@/constants/spacing";
+import type { RootStackParamList } from "@/navigation/AppNavigator";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useRef, useState } from "react";
 import { Dimensions, FlatList, Pressable, StyleSheet, Text, View } from "react-native";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import type { RootStackParamList } from "@/navigation/AppNavigator";
-import { COLORS } from "@/constants/colors";
-import { SPACING } from "@/constants/spacing";
-import { RADIUS } from "@/constants/radius";
 
-const ONBOARDING_KEY = "ecotrack_onboarding_done";
+const ONBOARDING_KEY = "ecoact_onboarding_done";
 const { width } = Dimensions.get("window");
 
 const SLIDES = [
@@ -30,7 +30,7 @@ export default function OnboardingScreen({ navigation }: Props) {
   return (
     <View style={styles.container}>
       <View style={styles.heroCard}>
-        <Text style={styles.heroTitle}>EcoTrack</Text>
+        <Text style={styles.heroTitle}>EcoAct</Text>
         <Text style={styles.heroSubtitle}>Track and reward environmental actions</Text>
       </View>
 

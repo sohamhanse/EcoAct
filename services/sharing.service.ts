@@ -1,40 +1,40 @@
-import { Alert, Linking, Platform } from "react-native";
-import * as Sharing from "expo-sharing";
-import * as MediaLibrary from "expo-media-library";
 import type { SharePayload } from "@/components/sharing/ShareCard";
+import * as MediaLibrary from "expo-media-library";
+import * as Sharing from "expo-sharing";
+import { Alert, Linking } from "react-native";
 
 export type ShareDestination = "instagram" | "twitter" | "whatsapp" | "general";
 
 function buildTwitterCaption(payload: SharePayload): string {
   switch (payload.type) {
     case "badge":
-      return `Just earned the ${payload.data.badgeName} badge on @EcoTrackApp 🏅 ${payload.data.co2Saved}kg CO₂ saved so far. Small actions, real impact. #EcoTrack #ClimateAction #Sustainability`;
+      return `Just earned the ${payload.data.badgeName} badge on @EcoActApp 🏅 ${payload.data.co2Saved}kg CO₂ saved so far. Small actions, real impact. #EcoAct #ClimateAction #Sustainability`;
     case "challenge":
-      return `My community saved ${payload.data.co2Kg}kg CO₂ in ${payload.data.days} days on @EcoTrackApp 🌍 ${payload.data.memberCount} of us made it happen. #EcoTrack #CommunityAction`;
+      return `My community saved ${payload.data.co2Kg}kg CO₂ in ${payload.data.days} days on @EcoActApp 🌍 ${payload.data.memberCount} of us made it happen. #EcoAct #CommunityAction`;
     case "footprint":
-      return `Reduced my carbon footprint by ${payload.data.improvementPercent}% this month on @EcoTrackApp 🌱 From ${payload.data.from}kg → ${payload.data.to}kg CO₂/year. #EcoTrack #CarbonFootprint`;
+      return `Reduced my carbon footprint by ${payload.data.improvementPercent}% this month on @EcoActApp 🌱 From ${payload.data.from}kg → ${payload.data.to}kg CO₂/year. #EcoAct #CarbonFootprint`;
   }
 }
 
 function buildWhatsAppCaption(payload: SharePayload): string {
   switch (payload.type) {
     case "badge":
-      return `I just earned the "${payload.data.badgeName}" badge on EcoTrack! 🏅 I've saved ${payload.data.co2Saved}kg CO₂. You should try it too 🌿`;
+      return `I just earned the "${payload.data.badgeName}" badge on EcoAct! 🏅 I've saved ${payload.data.co2Saved}kg CO₂. You should try it too 🌿`;
     case "challenge":
-      return `My community just hit a huge goal on EcoTrack — ${payload.data.co2Kg}kg CO₂ saved together! 🌍 Join us 🌿`;
+      return `My community just hit a huge goal on EcoAct — ${payload.data.co2Kg}kg CO₂ saved together! 🌍 Join us 🌿`;
     case "footprint":
-      return `I cut my carbon footprint by ${payload.data.improvementPercent}% this month using EcoTrack 🌱 Check it out!`;
+      return `I cut my carbon footprint by ${payload.data.improvementPercent}% this month using EcoAct 🌱 Check it out!`;
   }
 }
 
 function buildGeneralCaption(payload: SharePayload): string {
   switch (payload.type) {
     case "badge":
-      return `I just earned the ${payload.data.badgeName} badge on EcoTrack! 🏅`;
+      return `I just earned the ${payload.data.badgeName} badge on EcoAct! 🏅`;
     case "challenge":
-      return `My community saved ${payload.data.co2Kg}kg CO₂ on EcoTrack! 🌍`;
+      return `My community saved ${payload.data.co2Kg}kg CO₂ on EcoAct! 🌍`;
     case "footprint":
-      return `I reduced my carbon footprint by ${payload.data.improvementPercent}% on EcoTrack 🌱`;
+      return `I reduced my carbon footprint by ${payload.data.improvementPercent}% on EcoAct 🌱`;
   }
 }
 

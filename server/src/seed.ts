@@ -1,7 +1,7 @@
 import "dotenv/config";
 import mongoose from "mongoose";
-import { Mission } from "./models/Mission.model.js";
 import { Community } from "./models/Community.model.js";
+import { Mission } from "./models/Mission.model.js";
 import { User } from "./models/User.model.js";
 
 const SEED_MISSIONS = [
@@ -54,7 +54,7 @@ const SEED_COMMUNITIES = [
 ];
 
 async function seed() {
-  const uri = process.env.MONGODB_URI ?? "mongodb://localhost:27017/ecotrack";
+  const uri = process.env.MONGODB_URI ?? "mongodb://localhost:27017/ecoact";
   await mongoose.connect(uri);
 
   const missionCount = await Mission.countDocuments();
@@ -87,7 +87,7 @@ async function seed() {
     const demoUsers = DEMO_NAMES.map((name, i) => ({
       googleId: `demo-${i}-${Date.now()}`,
       name,
-      email: `demo${i}@ecotrack.demo`,
+      email: `demo${i}@ecoact.demo`,
       avatar: "",
       totalPoints: Math.floor(Math.random() * 800) + 50,
       totalCo2Saved: Math.floor(Math.random() * 200) + 10,

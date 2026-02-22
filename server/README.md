@@ -1,11 +1,11 @@
-# EcoTrack API
+# EcoAct API
 
-Node.js + Express + MongoDB backend for EcoTrack.
+Node.js + Express + MongoDB backend for EcoAct.
 
 ## Setup
 
 1. **Env:** A `.env` file exists (edit if needed). Set:
-   - `MONGODB_URI` (e.g. MongoDB Atlas or `mongodb://localhost:27017/ecotrack`)
+   - `MONGODB_URI` (e.g. MongoDB Atlas or `mongodb://localhost:27017/ecoact`)
    - `JWT_SECRET` and `JWT_REFRESH_SECRET` (min 32 chars each for production)
    - `PORT` (default 5000)
 

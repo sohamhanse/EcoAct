@@ -1,5 +1,5 @@
 /**
- * EcoTrack India Emission Factors (Server)
+ * EcoAct India Emission Factors (Server)
  * Sources: CEA v18, ICCT India, FAO/FOLU, BEE
  */
 

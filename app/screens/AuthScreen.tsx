@@ -1,16 +1,16 @@
-import type { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { useState, useEffect } from "react";
-import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from "react-native";
-import * as AuthSession from "expo-auth-session";
-import axios from "axios";
-import type { RootStackParamList } from "@/navigation/AppNavigator";
-import { useAuthStore } from "@/store/useAuthStore";
 import { setTokens } from "@/api/axiosInstance";
-import type { ApiUser } from "@/src/types";
-import { makeRedirectUri, exchangeCodeForIdToken, GOOGLE_ISSUER } from "@/services/googleAuth";
 import { COLORS } from "@/constants/colors";
-import { SPACING } from "@/constants/spacing";
 import { RADIUS } from "@/constants/radius";
+import { SPACING } from "@/constants/spacing";
+import type { RootStackParamList } from "@/navigation/AppNavigator";
+import { GOOGLE_ISSUER, exchangeCodeForIdToken, makeRedirectUri } from "@/services/googleAuth";
+import type { ApiUser } from "@/src/types";
+import { useAuthStore } from "@/store/useAuthStore";
+import type { NativeStackScreenProps } from "@react-navigation/native-stack";
+import axios from "axios";
+import * as AuthSession from "expo-auth-session";
+import { useEffect, useState } from "react";
+import { ActivityIndicator, Alert, Pressable, StyleSheet, Text, View } from "react-native";
 
 const API_BASE = process.env.EXPO_PUBLIC_API_URL ?? "http://localhost:5000";
 const API_DEMO_URL = `${API_BASE}/api/auth/demo`;
@@ -80,7 +80,7 @@ export default function AuthScreen({ navigation }: Props) {
     try {
       const { data } = await axios.post<{ success: boolean; accessToken?: string; refreshToken?: string; user?: ApiUser }>(
         API_DEMO_URL,
-        { name: "Demo User", email: `demo-${Date.now()}@ecotrack.app` },
+        { name: "Demo User", email: `demo-${Date.now()}@ecoact.app` },
       );
       if (data.success && data.accessToken && data.refreshToken && data.user) {
         await setTokens(data.accessToken, data.refreshToken);
@@ -133,7 +133,7 @@ export default function AuthScreen({ navigation }: Props) {
   return (
     <View style={styles.container}>
       <View style={styles.card}>
-        <Text style={styles.title}>Welcome to EcoTrack</Text>
+        <Text style={styles.title}>Welcome to EcoAct</Text>
         <Text style={styles.subtitle}>Sign in to track your footprint and earn rewards.</Text>
 
         <Pressable

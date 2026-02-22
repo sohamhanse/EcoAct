@@ -98,7 +98,7 @@ export const MILESTONE_TEMPLATES: MilestoneTemplate[] = [
     targetValue: 200,
     unit: "kg_co2",
     label: "Save 200 kg CO₂ this month",
-    description: "Elite level. One of the top performers on EcoTrack.",
+    description: "Elite level. One of the top performers on EcoAct.",
     bonusPoints: 750,
     badgeId: "monthly_200_badge",
     difficulty: "hard",

@@ -1,14 +1,14 @@
-import React from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
-import * as WebBrowser from "expo-web-browser";
-import { useNavigation } from "@react-navigation/native";
-import {
-  OFFSET_PROVIDERS,
-  calculateOffsetCost,
-} from "@/constants/offsetProviders";
 import { COLORS } from "@/constants/colors";
-import { SPACING } from "@/constants/spacing";
+import {
+    OFFSET_PROVIDERS,
+    calculateOffsetCost,
+} from "@/constants/offsetProviders";
 import { RADIUS } from "@/constants/radius";
+import { SPACING } from "@/constants/spacing";
+import { useNavigation } from "@react-navigation/native";
+import * as WebBrowser from "expo-web-browser";
+import React from "react";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 const shadowSm = {
   shadowColor: "#000",
@@ -81,7 +81,7 @@ export function OffsetSection({ co2Kg }: Props) {
       })}
 
       <Text style={styles.disclaimer}>
-        EcoTrack does not receive commission. These are independent verified providers.
+        EcoAct does not receive commission. These are independent verified providers.
       </Text>
 
       <View style={styles.reduceCard}>

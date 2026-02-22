@@ -1,13 +1,13 @@
+import { getAccessToken } from "@/api/axiosInstance";
+import { COLORS } from "@/constants/colors";
+import type { RootStackParamList } from "@/navigation/AppNavigator";
+import { useAuthStore } from "@/store/useAuthStore";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { useEffect, useRef } from "react";
 import { ActivityIndicator, Animated, Easing, StyleSheet, Text, View } from "react-native";
-import type { RootStackParamList } from "@/navigation/AppNavigator";
-import { useAuthStore } from "@/store/useAuthStore";
-import { getAccessToken } from "@/api/axiosInstance";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { COLORS } from "@/constants/colors";
 
-const ONBOARDING_KEY = "ecotrack_onboarding_done";
+const ONBOARDING_KEY = "ecoact_onboarding_done";
 
 type Props = NativeStackScreenProps<RootStackParamList, "Splash">;
 
@@ -82,7 +82,7 @@ export default function SplashScreen({ navigation }: Props) {
       <Animated.View style={[styles.logoCircle, { transform: [{ scale: pulse }], opacity: fade }]}>
         <Text style={styles.logoText}>ET</Text>
       </Animated.View>
-      <Animated.Text style={[styles.title, { opacity: fade }]}>EcoTrack</Animated.Text>
+      <Animated.Text style={[styles.title, { opacity: fade }]}>EcoAct</Animated.Text>
       <Animated.Text style={[styles.tagline, { opacity: fade }]}>Track. Act. Reduce.</Animated.Text>
       {!hydrated ? <ActivityIndicator size="small" color={COLORS.primaryPale} style={styles.loader} /> : null}
     </View>

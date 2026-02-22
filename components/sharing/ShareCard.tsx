@@ -1,8 +1,8 @@
-import React from "react";
-import { View, Text, StyleSheet, Dimensions } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import { COLORS } from "@/constants/colors";
 import { SPACING } from "@/constants/spacing";
+import { LinearGradient } from "expo-linear-gradient";
+import React from "react";
+import { StyleSheet, Text, View } from "react-native";
 
 const CARD_WIDTH = 360;
 const CARD_HEIGHT = 640;
@@ -46,13 +46,13 @@ export const ShareCard = React.forwardRef<View, Props>(function ShareCard(props,
           <Text style={styles.badgeEmoji}>🏅</Text>
           <Text style={styles.badgeLine1}>I just earned</Text>
           <Text style={styles.badgeLine2}>{props.data.badgeName}</Text>
-          <Text style={styles.badgeLine3}>on EcoTrack</Text>
+          <Text style={styles.badgeLine3}>on EcoAct</Text>
           <View style={styles.divider} />
           <Text style={styles.badgeStats}>
             {props.data.co2Saved} kg CO₂ saved · {props.data.missionsDone} missions done
           </Text>
           <View style={styles.footer}>
-            <Text style={styles.footerBrand}>🌿 EcoTrack</Text>
+            <Text style={styles.footerBrand}>🌿 EcoAct</Text>
             <Text style={styles.footerTag}>Track. Act. Reduce.</Text>
           </View>
         </View>
@@ -79,7 +79,7 @@ export const ShareCard = React.forwardRef<View, Props>(function ShareCard(props,
             {props.data.memberCount} contributors made this happen
           </Text>
           <View style={styles.footer}>
-            <Text style={styles.footerBrand}>🌿 EcoTrack</Text>
+            <Text style={styles.footerBrand}>🌿 EcoAct</Text>
           </View>
         </View>
       </View>
@@ -113,7 +113,7 @@ export const ShareCard = React.forwardRef<View, Props>(function ShareCard(props,
             {props.data.progressPercent}% of the way to carbon neutral
           </Text>
           <View style={styles.footer}>
-            <Text style={styles.footerBrand}>🌿 EcoTrack</Text>
+            <Text style={styles.footerBrand}>🌿 EcoAct</Text>
           </View>
         </View>
       </View>

@@ -1,9 +1,9 @@
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
 import * as authApi from "@/api/auth.api";
 import { getAccessToken } from "@/api/axiosInstance";
 import type { ApiUser } from "@/src/types";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 type AuthState = {
   user: ApiUser | null;
@@ -47,7 +47,7 @@ export const useAuthStore = create<AuthState>()(
       },
     }),
     {
-      name: "ecotrack-auth-store",
+      name: "ecoact-auth-store",
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (s) => ({ user: s.user }),
       onRehydrateStorage: () => (state) => {
