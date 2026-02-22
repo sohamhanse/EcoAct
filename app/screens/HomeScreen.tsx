@@ -16,8 +16,9 @@ import { getRecommendedMissions } from "@/api/missions.api";
 import { useMilestones } from "@/hooks/useMilestones";
 import { getMyCommunity } from "@/api/community.api";
 import { getMyLeaderboardRank } from "@/api/leaderboard.api";
+import { getPUCDashboard } from "@/api/puc.api";
 import type { MainStackParamList } from "@/navigation/MainNavigator";
-import type { ApiMission } from "@/src/types";
+import type { ApiMission, ApiVehicleWithStatus } from "@/src/types";
 import { MilestoneCard } from "@/components/milestones/MilestoneCard";
 import { ShareBottomSheet } from "@/components/sharing/ShareBottomSheet";
 import type { SharePayload } from "@/components/sharing/ShareCard";
@@ -31,6 +32,14 @@ type Nav = NativeStackNavigationProp<MainStackParamList>;
 const INDIA_AVG = 1700;
 const CARBON_NEUTRAL_GOAL = 2000;
 
+function urgencyRank(status: ApiVehicleWithStatus["pucStatus"]["status"]): number {
+  if (status === "expired") return 0;
+  if (status === "expiring_soon") return 1;
+  if (status === "no_record") return 2;
+  if (status === "valid") return 3;
+  return 4;
+}
+
 export default function HomeScreen() {
   const navigation = useNavigation<Nav>();
   const user = useAuthStore((s) => s.user);
@@ -42,20 +51,36 @@ export default function HomeScreen() {
   const { active: milestones, loading: milestonesLoading, refetch: refetchMilestones } = useMilestones();
   const [sharePayload, setSharePayload] = useState<SharePayload | null>(null);
   const [globalRank, setGlobalRank] = useState<number | null>(null);
+  const [urgentVehicles, setUrgentVehicles] = useState<ApiVehicleWithStatus[]>([]);
+  const [hasVehicles, setHasVehicles] = useState(false);
 
   const load = useCallback(async () => {
     try {
-      const [rec, comm, rankRes] = await Promise.all([
+      const [rec, comm, rankRes, pucDashboard] = await Promise.all([
         getRecommendedMissions(),
         getMyCommunity(),
         getMyLeaderboardRank().catch(() => null),
+        getPUCDashboard().catch(() => null),
       ]);
       setMissions(rec);
       setMine(comm.community ?? null);
       setGlobalRank(rankRes?.globalRank ?? null);
+      const allVehicles = pucDashboard?.vehicles ?? [];
+      setHasVehicles(allVehicles.length > 0);
+      const urgent = allVehicles
+        .filter((item) => item.pucStatus.status === "expired" || item.pucStatus.status === "expiring_soon")
+        .sort((a, b) => {
+          const rankDiff = urgencyRank(a.pucStatus.status) - urgencyRank(b.pucStatus.status);
+          if (rankDiff !== 0) return rankDiff;
+          return a.pucStatus.daysRemaining - b.pucStatus.daysRemaining;
+        })
+        .slice(0, 2);
+      setUrgentVehicles(urgent);
       refetchMilestones();
     } catch {
       setMissions([]);
+      setUrgentVehicles([]);
+      setHasVehicles(false);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -70,6 +95,10 @@ export default function HomeScreen() {
     setRefreshing(true);
     load();
   }, [load]);
+
+  function openPUCTab() {
+    (navigation as unknown as { navigate: (name: string) => void }).navigate("PUC");
+  }
 
   const baseline = user?.footprintBaseline ?? INDIA_AVG;
   const saved = user?.totalCo2Saved ?? 0;
@@ -147,7 +176,7 @@ export default function HomeScreen() {
             <Pressable
               key={m._id}
               style={({ pressed }) => [styles.missionCard, pressed && styles.missionCardPressed]}
-              onPress={() => navigation.navigate("Missions")}
+              onPress={() => navigation.navigate("Missions" as never)}
               accessibilityLabel={`${m.title}, ${m.co2Saved} kg CO₂ saved, ${m.basePoints} points`}
               accessibilityRole="button"
             >
@@ -158,6 +187,31 @@ export default function HomeScreen() {
           ))}
         </ScrollView>
       )}
+
+      {hasVehicles && urgentVehicles.length > 0 ? (
+        <View style={styles.pucWidget}>
+          <Text style={styles.pucWidgetTitle}>My Vehicles - PUC Status</Text>
+          {urgentVehicles.map((item) => (
+            <View key={item.vehicle._id} style={styles.pucRow}>
+              <View style={styles.pucRowInfo}>
+                <Text style={styles.pucRowName}>{item.vehicle.nickname}</Text>
+                <Text style={styles.pucRowSub}>
+                  {item.pucStatus.status === "expired"
+                    ? `Expired ${Math.abs(item.pucStatus.daysRemaining)} day(s)`
+                    : `Expires in ${item.pucStatus.daysRemaining} day(s)`}
+                </Text>
+              </View>
+              <Pressable onPress={openPUCTab}>
+                <Text style={styles.pucLink}>Log PUC Now</Text>
+              </Pressable>
+            </View>
+          ))}
+        </View>
+      ) : !hasVehicles ? (
+        <Pressable style={styles.pucAddLink} onPress={openPUCTab}>
+          <Text style={styles.pucAddLinkLabel}>Add your vehicle and track PUC</Text>
+        </Pressable>
+      ) : null}
 
       <Text style={styles.sectionTitle}>My milestones</Text>
       {milestonesLoading ? (
@@ -249,6 +303,36 @@ const styles = StyleSheet.create({
   missionTitle: { fontSize: TYPOGRAPHY.size.sm, fontWeight: TYPOGRAPHY.weight.semibold, color: COLORS.textPrimary },
   missionCo2: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.success, marginTop: SPACING.xs },
   missionPoints: { fontSize: TYPOGRAPHY.size.xs, color: COLORS.textMuted, marginTop: 2 },
+  pucWidget: {
+    marginTop: SPACING.xl,
+    backgroundColor: COLORS.surface,
+    borderColor: COLORS.border,
+    borderWidth: 1,
+    borderRadius: RADIUS.md,
+    padding: SPACING.md,
+  },
+  pucWidgetTitle: {
+    fontSize: TYPOGRAPHY.size.sm,
+    color: COLORS.textSecondary,
+    fontWeight: TYPOGRAPHY.weight.bold,
+    textTransform: "uppercase",
+    letterSpacing: 0.3,
+    marginBottom: SPACING.sm,
+  },
+  pucRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: SPACING.sm,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+  },
+  pucRowInfo: { flex: 1, marginRight: SPACING.sm },
+  pucRowName: { fontSize: TYPOGRAPHY.size.sm, fontWeight: TYPOGRAPHY.weight.semibold, color: COLORS.textPrimary },
+  pucRowSub: { marginTop: 2, fontSize: TYPOGRAPHY.size.xs, color: COLORS.textSecondary },
+  pucLink: { color: COLORS.primary, fontSize: TYPOGRAPHY.size.xs, fontWeight: TYPOGRAPHY.weight.bold },
+  pucAddLink: { marginTop: SPACING.lg, alignSelf: "flex-start" },
+  pucAddLinkLabel: { color: COLORS.primary, fontSize: TYPOGRAPHY.size.sm, fontWeight: TYPOGRAPHY.weight.semibold },
   communityCard: {
     marginTop: SPACING.xl,
     backgroundColor: COLORS.primaryPale,

@@ -49,3 +49,25 @@ node run-seed.cjs
 - `GET /api/community` — List communities (query: type, search)
 - `GET /api/community/mine` — My community (Bearer)
 - `POST /api/community/:id/join` | `POST /api/community/leave` — Join/leave (Bearer)
+
+### Admin dashboard endpoints (Web only)
+
+- `POST /api/admin/auth/demo-login` — Demo admin login (dev only)
+- `GET /api/admin/auth/me` — Current admin user (Bearer)
+- `GET /api/admin/community/:communityId/stats/overview` — KPI overview (Bearer + community admin)
+- `GET /api/admin/community/:communityId/stats/timeseries` — Time-series analytics (Bearer + community admin)
+- `GET /api/admin/community/:communityId/events` — List events
+- `POST /api/admin/community/:communityId/events` — Create event
+- `GET /api/admin/community/:communityId/events/:eventId` — Event detail
+- `PATCH /api/admin/community/:communityId/events/:eventId` — Update event
+- `DELETE /api/admin/community/:communityId/events/:eventId` — Delete event
+- `POST /api/admin/community/:communityId/events/:eventId/publish` — Publish event
+- `POST /api/admin/community/:communityId/events/:eventId/archive` — Archive event
+- `GET /api/admin/community/:communityId/quizzes` — List quizzes
+- `POST /api/admin/community/:communityId/quizzes` — Create quiz
+- `GET /api/admin/community/:communityId/quizzes/:quizId` — Quiz detail
+- `PATCH /api/admin/community/:communityId/quizzes/:quizId` — Update quiz
+- `DELETE /api/admin/community/:communityId/quizzes/:quizId` — Delete quiz
+- `POST /api/admin/community/:communityId/quizzes/:quizId/publish` — Publish quiz
+- `POST /api/admin/community/:communityId/quizzes/:quizId/archive` — Archive quiz
+- `GET /api/admin/community/:communityId/quizzes/:quizId/analytics` — Quiz analytics

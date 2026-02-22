@@ -8,12 +8,14 @@ import CalculatorScreen from "@/app/screens/CalculatorScreen";
 import MissionsScreen from "@/app/screens/MissionsScreen";
 import LeaderboardScreen from "@/app/screens/LeaderboardScreen";
 import ProfileScreen from "@/app/screens/ProfileScreen";
+import PUCNavigator from "@/navigation/PUCNavigator";
 
 export type TabParamList = {
   Home: undefined;
   Calculator: undefined;
   Missions: undefined;
   Leaderboard: undefined;
+  PUC: undefined;
   Profile: undefined;
 };
 
@@ -24,6 +26,7 @@ const tabIcons: Record<keyof TabParamList, { active: keyof typeof Ionicons.glyph
   Calculator: { active: "calculator", inactive: "calculator-outline" },
   Missions: { active: "leaf", inactive: "leaf-outline" },
   Leaderboard: { active: "trophy", inactive: "trophy-outline" },
+  PUC: { active: "alert-circle", inactive: "alert-circle-outline" },
   Profile: { active: "person", inactive: "person-outline" },
 };
 
@@ -57,6 +60,7 @@ export function BottomTabNavigator() {
       <Tab.Screen name="Calculator" component={CalculatorScreen} />
       <Tab.Screen name="Missions" component={MissionsScreen} />
       <Tab.Screen name="Leaderboard" component={LeaderboardScreen} />
+      <Tab.Screen name="PUC" component={PUCNavigator} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );

@@ -38,6 +38,73 @@ export interface ApiCommunity {
   totalPoints: number;
 }
 
+export interface ApiCommunityEvent {
+  _id: string;
+  title: string;
+  description: string;
+  startAt: string;
+  endAt: string;
+  location: string;
+  coverImageUrl: string;
+  maxParticipants: number | null;
+  rsvps: number;
+  attended: number;
+  myStatus?: "registered" | "attended" | "cancelled" | null;
+}
+
+export interface ApiCommunityQuiz {
+  _id: string;
+  title: string;
+  description: string;
+  startAt: string | null;
+  endAt: string | null;
+  timeLimitMinutes: number | null;
+  passingScore: number;
+  questionCount: number;
+  attempts: number;
+  avgScore: number;
+}
+
+export interface ApiCommunityQuizDetail {
+  _id: string;
+  title: string;
+  description: string;
+  passingScore: number;
+  timeLimitMinutes: number | null;
+  startAt: string | null;
+  endAt: string | null;
+  isActive: boolean;
+  questions: Array<{
+    index: number;
+    prompt: string;
+    options: string[];
+  }>;
+  lastAttempt: {
+    scorePercent: number;
+    passed: boolean;
+    completedAt: string;
+  } | null;
+}
+
+export interface ApiQuizAttemptResult {
+  attempt: {
+    _id: string;
+    quizId: string;
+    scorePercent: number;
+    correctCount: number;
+    totalQuestions: number;
+    passed: boolean;
+    completedAt: string;
+  };
+  questionResults: Array<{
+    questionIndex: number;
+    selectedIndex: number;
+    correctIndex: number;
+    isCorrect: boolean;
+    explanation: string;
+  }>;
+}
+
 export interface FootprintBreakdown {
   transport: number;
   food: number;
@@ -118,3 +185,5 @@ export interface CommunityStatsResponse {
     missionCount: number;
   }>;
 }
+
+export * from "./puc.types";

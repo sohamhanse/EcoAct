@@ -10,6 +10,7 @@ export interface IUser extends Document {
   name: string;
   email: string;
   avatar: string;
+  expoPushToken: string | null;
   totalPoints: number;
   totalCo2Saved: number;
   footprintBaseline: number;
@@ -34,6 +35,7 @@ const userSchema = new Schema<IUser>(
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     avatar: { type: String, default: "" },
+    expoPushToken: { type: String, default: null },
     totalPoints: { type: Number, default: 0 },
     totalCo2Saved: { type: Number, default: 0 },
     footprintBaseline: { type: Number, default: 0 },
@@ -47,7 +49,6 @@ const userSchema = new Schema<IUser>(
   { timestamps: true },
 );
 
-userSchema.index({ email: 1 });
 userSchema.index({ communityId: 1 });
 userSchema.index({ totalPoints: -1 });
 userSchema.index({ totalCo2Saved: -1 });

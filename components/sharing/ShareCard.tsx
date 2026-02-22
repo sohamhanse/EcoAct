@@ -27,10 +27,17 @@ export interface FootprintShareData {
   progressPercent: number;
 }
 
+export interface PUCShareData {
+  vehicleName: string;
+  pointsAwarded: number;
+  co2ImpactKg: number;
+}
+
 export type SharePayload =
   | { type: "badge"; data: BadgeShareData }
   | { type: "challenge"; data: ChallengeShareData }
-  | { type: "footprint"; data: FootprintShareData };
+  | { type: "footprint"; data: FootprintShareData }
+  | { type: "puc"; data: PUCShareData };
 
 type Props = SharePayload;
 
@@ -114,6 +121,27 @@ export const ShareCard = React.forwardRef<View, Props>(function ShareCard(props,
           </Text>
           <View style={styles.footer}>
             <Text style={styles.footerBrand}>🌿 EcoAct</Text>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  if (props.type === "puc") {
+    return (
+      <View style={[styles.card, { width: CARD_WIDTH, height: CARD_HEIGHT }]}>
+        <LinearGradient
+          colors={["#1A6B3C", "#00C896"]}
+          style={StyleSheet.absoluteFill}
+        />
+        <View style={styles.content}>
+          <Text style={styles.challengeEmoji}>CAR</Text>
+          <Text style={styles.challengeTitle}>PUC Compliant</Text>
+          <Text style={styles.challengeLine1}>{props.data.vehicleName} is renewed on EcoAct</Text>
+          <Text style={styles.challengeBig}>+{props.data.pointsAwarded} pts</Text>
+          <Text style={styles.challengeLine2}>~{props.data.co2ImpactKg} kg CO2e prevented/year</Text>
+          <View style={styles.footer}>
+            <Text style={styles.footerBrand}>EcoAct</Text>
           </View>
         </View>
       </View>

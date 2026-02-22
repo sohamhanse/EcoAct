@@ -7,12 +7,15 @@ import { connectDB } from "./config/db.js";
 import { errorMiddleware } from "./middleware/error.middleware.js";
 import { apiLimiter } from "./middleware/rateLimit.middleware.js";
 import authRoutes from "./routes/auth.routes.js";
+import adminRoutes from "./routes/admin.routes.js";
 import calculatorRoutes from "./routes/calculator.routes.js";
 import communityRoutes from "./routes/community.routes.js";
 import leaderboardRoutes from "./routes/leaderboard.routes.js";
 import milestoneRoutes from "./routes/milestone.routes.js";
 import missionRoutes from "./routes/mission.routes.js";
 import userRoutes from "./routes/user.routes.js";
+import pucRoutes from "./routes/puc.routes.js";
+import { startPUCReminderCron } from "./jobs/pucReminder.cron.js";
 
 const PORT = parseInt(process.env.PORT ?? "5000", 10);
 const MONGODB_URI = process.env.MONGODB_URI ?? "mongodb://localhost:27017/ecoact";
@@ -25,12 +28,14 @@ app.use(express.json());
 app.use(apiLimiter);
 
 app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
 app.use("/api/calculator", calculatorRoutes);
 app.use("/api/missions", missionRoutes);
 app.use("/api/leaderboard", leaderboardRoutes);
 app.use("/api/community", communityRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/milestones", milestoneRoutes);
+app.use("/api/puc", pucRoutes);
 
 app.get("/health", (_req, res) => res.json({ ok: true }));
 
@@ -42,6 +47,7 @@ async function main() {
   const { expireRecurringMilestones } = await import("./services/milestone.service.js");
   setInterval(expireChallenges, 60 * 60 * 1000);
   setInterval(expireRecurringMilestones, 24 * 60 * 60 * 1000);
+  startPUCReminderCron();
   expireChallenges().catch((e) => console.error("Challenge expiry:", e));
   expireRecurringMilestones().catch((e) => console.error("Milestone expiry:", e));
   app.listen(PORT, () => console.log(`EcoAct server listening on port ${PORT}`));

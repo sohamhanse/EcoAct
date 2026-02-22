@@ -1,6 +1,8 @@
 import "dotenv/config";
 import mongoose from "mongoose";
 import { Community } from "./models/Community.model.js";
+import { CommunityEvent } from "./models/CommunityEvent.model.js";
+import { CommunityQuiz } from "./models/CommunityQuiz.model.js";
 import { Mission } from "./models/Mission.model.js";
 import { User } from "./models/User.model.js";
 
@@ -65,7 +67,7 @@ async function seed() {
 
   let communities = await Community.find().lean();
   if (communities.length === 0) {
-    const inserted = await Community.insertMany(
+    await Community.insertMany(
       SEED_COMMUNITIES.map((c) => ({
         ...c,
         memberCount: 0,
@@ -73,7 +75,7 @@ async function seed() {
         totalPoints: 0,
       })),
     );
-    communities = inserted;
+    communities = await Community.find().lean();
     console.log("Seeded", communities.length, "communities");
   }
   const { ensureActiveChallenge } = await import("./services/challenge.service.js");
@@ -109,6 +111,100 @@ async function seed() {
       });
     }
     console.log("Seeded", demoUsers.length, "demo users");
+  }
+
+  let admin = await User.findOne({ role: "admin" });
+  if (!admin) {
+    const firstCommunity = await Community.findOne().sort({ createdAt: 1 });
+    if (firstCommunity) {
+      admin = await User.create({
+        googleId: `seed-admin-${Date.now()}`,
+        name: "EcoAct Admin",
+        email: "admin@ecoact.app",
+        avatar: "",
+        role: "admin",
+        communityId: firstCommunity._id,
+      });
+      await Community.findByIdAndUpdate(firstCommunity._id, { $inc: { memberCount: 1 } });
+      console.log("Seeded admin user: admin@ecoact.app");
+    }
+  }
+
+  if (admin?.communityId) {
+    const communityId = admin.communityId;
+    const eventCount = await CommunityEvent.countDocuments({ communityId });
+    if (eventCount === 0) {
+      const now = new Date();
+      const nextWeek = new Date(now);
+      nextWeek.setDate(nextWeek.getDate() + 7);
+      const nextMonth = new Date(now);
+      nextMonth.setDate(nextMonth.getDate() + 30);
+      await CommunityEvent.insertMany([
+        {
+          communityId,
+          title: "Zero Waste Sunday Drive",
+          description: "Community clean-up and waste segregation awareness event.",
+          startAt: nextWeek,
+          endAt: new Date(nextWeek.getTime() + 2 * 60 * 60 * 1000),
+          location: "Community Hall",
+          status: "published",
+          createdBy: admin._id,
+          updatedBy: admin._id,
+          publishedAt: now,
+        },
+        {
+          communityId,
+          title: "Energy Saver Workshop",
+          description: "Workshop on reducing home and campus electricity usage.",
+          startAt: nextMonth,
+          endAt: new Date(nextMonth.getTime() + 90 * 60 * 1000),
+          location: "Auditorium",
+          status: "draft",
+          createdBy: admin._id,
+          updatedBy: admin._id,
+          publishedAt: null,
+        },
+      ]);
+      console.log("Seeded sample community events");
+    }
+
+    const quizCount = await CommunityQuiz.countDocuments({ communityId });
+    if (quizCount === 0) {
+      await CommunityQuiz.create({
+        communityId,
+        title: "Climate Action Basics",
+        description: "Test your knowledge of practical sustainability actions.",
+        status: "published",
+        startAt: new Date(),
+        endAt: null,
+        timeLimitMinutes: 10,
+        passingScore: 60,
+        questions: [
+          {
+            prompt: "Which action usually reduces transport CO2 the most for short daily trips?",
+            options: ["Using private car", "Walking or cycling", "Idling in traffic", "Taking a flight"],
+            correctOptionIndex: 1,
+            explanation: "Walking and cycling avoid fuel consumption for short commutes.",
+          },
+          {
+            prompt: "What is one effective way to cut home energy emissions?",
+            options: ["Keep appliances on standby", "Use LED bulbs", "Run AC with doors open", "Overcool rooms"],
+            correctOptionIndex: 1,
+            explanation: "LED bulbs consume significantly less power than incandescent alternatives.",
+          },
+          {
+            prompt: "Why are community challenges useful?",
+            options: ["They reduce transparency", "They only reward a few users", "They create shared accountability", "They replace individual action"],
+            correctOptionIndex: 2,
+            explanation: "Shared goals and visible progress improve participation and consistency.",
+          },
+        ],
+        createdBy: admin._id,
+        updatedBy: admin._id,
+        publishedAt: new Date(),
+      });
+      console.log("Seeded sample community quiz");
+    }
   }
 
   await mongoose.disconnect();

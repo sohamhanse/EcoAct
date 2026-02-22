@@ -34,6 +34,17 @@ npm start
 
 Use **Demo login** on the Auth screen if the server is running (no Google config required). Set `EXPO_PUBLIC_API_URL` (e.g. `http://YOUR_IP:5000`) when testing on a device.
 
+### 3. Community Admin Web Dashboard (Web only)
+
+```bash
+cd admin-web
+npm install
+npm run dev
+```
+
+Set `VITE_API_BASE_URL` in `admin-web/.env` if your API is not running on `http://localhost:5000`.
+Use demo admin login with `admin@ecoact.app` after seeding (`cd server && npm run seed`).
+
 ## App flow
 
 1. **Splash** → auth check → **Onboarding** (3 slides) → **Auth** (Google or Demo login)
@@ -48,6 +59,7 @@ Use **Demo login** on the Auth screen if the server is running (no Google config
 - `store/` — Zustand: useAuthStore, useUserStore, useMissionStore, useCommunityStore
 - `constants/` — colors, typography, spacing, radius, shadows, emission factors + calculator
 - `navigation/` — AppNavigator (Splash/Onboarding/Auth/Main), MainNavigator (Tabs + Community), BottomTabNavigator
+- `admin-web/` — Separate React+Vite web app for community admin operations (events, quizzes, analytics)
 
 ## API (high level)
 
@@ -58,6 +70,7 @@ Use **Demo login** on the Auth screen if the server is running (no Google config
 - `GET /api/community`, `GET /api/community/mine`, `POST /api/community/:id/join`, `POST /api/community/leave`
 
 See `server/README.md` for full endpoint list and env vars.
+See `docs/ADMIN_DASHBOARD_WEB.md` for admin dashboard setup and API details.
 
 ## Validate
 

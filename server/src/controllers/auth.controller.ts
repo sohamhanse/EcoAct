@@ -109,7 +109,7 @@ export async function demoAuth(req: AuthRequest, res: Response): Promise<void> {
   const payloadToken: TokenPayload = { userId: user._id.toString() };
   const accessToken = signAccessToken(payloadToken);
   const refreshToken = signRefreshToken(payloadToken);
-  const u = user.toObject() as Record<string, unknown>;
+  const u = user.toObject();
 
   success(res, {
     accessToken,
@@ -119,14 +119,14 @@ export async function demoAuth(req: AuthRequest, res: Response): Promise<void> {
       name: u.name,
       email: u.email,
       avatar: u.avatar ?? "",
-      totalPoints: Number(u.totalPoints ?? 0),
-      totalCo2Saved: Number(u.totalCo2Saved ?? 0),
-      footprintBaseline: Number(u.footprintBaseline ?? 0),
-      currentStreak: Number(u.currentStreak ?? 0),
-      longestStreak: Number(u.longestStreak ?? 0),
+      totalPoints: u.totalPoints ?? 0,
+      totalCo2Saved: u.totalCo2Saved ?? 0,
+      footprintBaseline: u.footprintBaseline ?? 0,
+      currentStreak: u.currentStreak ?? 0,
+      longestStreak: u.longestStreak ?? 0,
       badges: Array.isArray(u.badges) ? u.badges : [],
       communityId: u.communityId != null ? String(u.communityId) : null,
-      role: (u.role as string) || "user",
+      role: u.role ?? "user",
     },
   });
 }

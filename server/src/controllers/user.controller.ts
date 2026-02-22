@@ -1,10 +1,15 @@
 import type { Response } from "express";
+import { z } from "zod";
 import { User } from "../models/User.model.js";
 import { UserMission } from "../models/UserMission.model.js";
 import { FootprintLog } from "../models/FootprintLog.model.js";
 import { BADGES } from "../services/badge.service.js";
 import { success, error } from "../utils/response.utils.js";
 import type { AuthRequest } from "../middleware/auth.middleware.js";
+
+const settingsSchema = z.object({
+  expoPushToken: z.string().trim().min(1).max(255).nullable().optional(),
+});
 
 export async function profile(req: AuthRequest, res: Response): Promise<void> {
   if (!req.user) {
@@ -63,5 +68,20 @@ export async function settings(req: AuthRequest, res: Response): Promise<void> {
     error(res, "Not authenticated", "UNAUTHORIZED", 401);
     return;
   }
+  const parsed = settingsSchema.safeParse(req.body ?? {});
+  if (!parsed.success) {
+    error(res, "Invalid settings payload", "BAD_REQUEST", 400);
+    return;
+  }
+
+  const update: Record<string, unknown> = {};
+  if (parsed.data.expoPushToken !== undefined) {
+    update.expoPushToken = parsed.data.expoPushToken;
+  }
+
+  if (Object.keys(update).length > 0) {
+    await User.findByIdAndUpdate(req.user.userId, { $set: update });
+  }
+
   success(res, { message: "Settings updated" });
 }

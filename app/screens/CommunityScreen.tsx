@@ -12,10 +12,18 @@ import {
   Alert,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useAuthStore } from "@/store/useAuthStore";
 import { useCommunityStore } from "@/store/useCommunityStore";
-import { getCommunities, getMyCommunity, joinCommunity, leaveCommunity } from "@/api/community.api";
-import type { ApiCommunity } from "@/src/types";
+import {
+  getCommunities,
+  getMyCommunity,
+  joinCommunity,
+  leaveCommunity,
+  getCommunityEvents,
+  getCommunityQuizzes,
+} from "@/api/community.api";
+import type { ApiCommunity, ApiCommunityEvent, ApiCommunityQuiz } from "@/src/types";
 import { COLORS } from "@/constants/colors";
 import { RADIUS } from "@/constants/radius";
 import { SPACING } from "@/constants/spacing";
@@ -32,11 +40,13 @@ import { ActivityFeed } from "@/components/community/ActivityFeed";
 import { ChallengeCompletionModal } from "@/components/community/ChallengeCompletionModal";
 import { ShareBottomSheet } from "@/components/sharing/ShareBottomSheet";
 import type { SharePayload } from "@/components/sharing/ShareCard";
+import type { MainStackParamList } from "@/navigation/MainNavigator";
 
 type Tab = "discover" | "mine";
+type Nav = NativeStackNavigationProp<MainStackParamList, "Community">;
 
 export default function CommunityScreen() {
-  const navigation = useNavigation();
+  const navigation = useNavigation<Nav>();
   const user = useAuthStore((s) => s.user);
   const mine = useCommunityStore((s) => s.mine);
   const setMine = useCommunityStore((s) => s.setMine);
@@ -45,9 +55,12 @@ export default function CommunityScreen() {
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<"college" | "city" | "company" | "">("");
   const [loading, setLoading] = useState(true);
+  const [engagementLoading, setEngagementLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [joiningId, setJoiningId] = useState<string | null>(null);
   const [sharePayload, setSharePayload] = useState<SharePayload | null>(null);
+  const [events, setEvents] = useState<ApiCommunityEvent[]>([]);
+  const [quizzes, setQuizzes] = useState<ApiCommunityQuiz[]>([]);
 
   const communityId = mine?._id ?? null;
   const { stats, loading: statsLoading, refetch: refetchStats } = useCommunityStats(communityId);
@@ -75,6 +88,28 @@ export default function CommunityScreen() {
     }
   }, [setMine]);
 
+  const loadEngagement = useCallback(async () => {
+    if (!communityId) {
+      setEvents([]);
+      setQuizzes([]);
+      return;
+    }
+    setEngagementLoading(true);
+    try {
+      const [eventsRes, quizzesRes] = await Promise.all([
+        getCommunityEvents(communityId, { page: 1, limit: 5 }),
+        getCommunityQuizzes(communityId, { page: 1, limit: 5 }),
+      ]);
+      setEvents(eventsRes.events ?? []);
+      setQuizzes(quizzesRes.quizzes ?? []);
+    } catch {
+      setEvents([]);
+      setQuizzes([]);
+    } finally {
+      setEngagementLoading(false);
+    }
+  }, [communityId]);
+
   const load = useCallback(async () => {
     setLoading(true);
     await Promise.all([loadDiscover(), loadMine()]);
@@ -85,6 +120,10 @@ export default function CommunityScreen() {
   useEffect(() => {
     load();
   }, [load]);
+
+  useEffect(() => {
+    loadEngagement();
+  }, [loadEngagement]);
 
   useEffect(() => {
     if (tab === "discover") {
@@ -125,6 +164,7 @@ export default function CommunityScreen() {
     refetchStats();
     refetchChallenge();
     refetchFeed();
+    loadEngagement();
   }
 
   return (
@@ -197,6 +237,18 @@ export default function CommunityScreen() {
               memberCount={mine.memberCount}
               totalCo2Saved={mine.totalCo2Saved}
             />
+            <Pressable
+              style={styles.engagementCta}
+              onPress={() =>
+                navigation.navigate("CommunityEngagement", {
+                  communityId: mine._id,
+                  communityName: mine.name,
+                })
+              }
+            >
+              <Text style={styles.engagementCtaTitle}>Open Events & Quizzes</Text>
+              <Text style={styles.engagementCtaSubtitle}>RSVP to activities and take community quizzes</Text>
+            </Pressable>
             {statsLoading ? (
               <ActivityIndicator color={COLORS.primary} style={{ marginVertical: SPACING.lg }} />
             ) : stats ? (
@@ -208,6 +260,44 @@ export default function CommunityScreen() {
                 />
                 <Text style={styles.sectionTitle}>THIS WEEK'S CHALLENGE</Text>
                 <ChallengeCard challenge={challenge} />
+                <Text style={styles.sectionTitle}>UPCOMING EVENTS</Text>
+                {engagementLoading ? (
+                  <ActivityIndicator color={COLORS.primary} size="small" style={{ marginVertical: SPACING.sm }} />
+                ) : events.length > 0 ? (
+                  <View style={styles.engagementList}>
+                    {events.map((event) => (
+                      <View key={event._id} style={styles.engagementCard}>
+                        <Text style={styles.engagementTitle}>{event.title}</Text>
+                        <Text style={styles.engagementMeta}>
+                          {new Date(event.startAt).toLocaleDateString()} · {event.location || "Community venue"}
+                        </Text>
+                        <Text style={styles.engagementSubtext}>
+                          {event.rsvps} RSVPs{event.maxParticipants ? ` / ${event.maxParticipants} max` : ""}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                ) : (
+                  <Text style={styles.emptyEngagement}>No published events yet</Text>
+                )}
+                <Text style={styles.sectionTitle}>LIVE QUIZZES</Text>
+                {engagementLoading ? (
+                  <ActivityIndicator color={COLORS.primary} size="small" style={{ marginVertical: SPACING.sm }} />
+                ) : quizzes.length > 0 ? (
+                  <View style={styles.engagementList}>
+                    {quizzes.map((quiz) => (
+                      <View key={quiz._id} style={styles.engagementCard}>
+                        <Text style={styles.engagementTitle}>{quiz.title}</Text>
+                        <Text style={styles.engagementMeta}>
+                          {quiz.questionCount} questions · Pass {quiz.passingScore}% · {quiz.attempts} attempts
+                        </Text>
+                        <Text style={styles.engagementSubtext}>Average score: {quiz.avgScore}%</Text>
+                      </View>
+                    ))}
+                  </View>
+                ) : (
+                  <Text style={styles.emptyEngagement}>No published quizzes yet</Text>
+                )}
                 <WeeklyTrendChart
                   data={stats.weeklyTrend}
                   maxValue={Math.max(1, ...stats.weeklyTrend.map((d) => d.co2Saved))}
@@ -228,6 +318,44 @@ export default function CommunityScreen() {
               <>
                 <Text style={styles.sectionTitle}>THIS WEEK'S CHALLENGE</Text>
                 <ChallengeCard challenge={challenge} />
+                <Text style={styles.sectionTitle}>UPCOMING EVENTS</Text>
+                {engagementLoading ? (
+                  <ActivityIndicator color={COLORS.primary} size="small" style={{ marginVertical: SPACING.sm }} />
+                ) : events.length > 0 ? (
+                  <View style={styles.engagementList}>
+                    {events.map((event) => (
+                      <View key={event._id} style={styles.engagementCard}>
+                        <Text style={styles.engagementTitle}>{event.title}</Text>
+                        <Text style={styles.engagementMeta}>
+                          {new Date(event.startAt).toLocaleDateString()} · {event.location || "Community venue"}
+                        </Text>
+                        <Text style={styles.engagementSubtext}>
+                          {event.rsvps} RSVPs{event.maxParticipants ? ` / ${event.maxParticipants} max` : ""}
+                        </Text>
+                      </View>
+                    ))}
+                  </View>
+                ) : (
+                  <Text style={styles.emptyEngagement}>No published events yet</Text>
+                )}
+                <Text style={styles.sectionTitle}>LIVE QUIZZES</Text>
+                {engagementLoading ? (
+                  <ActivityIndicator color={COLORS.primary} size="small" style={{ marginVertical: SPACING.sm }} />
+                ) : quizzes.length > 0 ? (
+                  <View style={styles.engagementList}>
+                    {quizzes.map((quiz) => (
+                      <View key={quiz._id} style={styles.engagementCard}>
+                        <Text style={styles.engagementTitle}>{quiz.title}</Text>
+                        <Text style={styles.engagementMeta}>
+                          {quiz.questionCount} questions · Pass {quiz.passingScore}% · {quiz.attempts} attempts
+                        </Text>
+                        <Text style={styles.engagementSubtext}>Average score: {quiz.avgScore}%</Text>
+                      </View>
+                    ))}
+                  </View>
+                ) : (
+                  <Text style={styles.emptyEngagement}>No published quizzes yet</Text>
+                )}
               </>
             )}
             <Pressable style={styles.leaveBtn} onPress={handleLeave}>
@@ -251,6 +379,17 @@ export default function CommunityScreen() {
                 <Text style={styles.cardType}>{item.type}</Text>
                 <Text style={styles.cardMeta}>{item.memberCount} members · {item.totalCo2Saved} kg saved</Text>
                 {item.description ? <Text style={styles.cardDesc}>{item.description}</Text> : null}
+                <Pressable
+                  style={styles.viewEngagementBtn}
+                  onPress={() =>
+                    navigation.navigate("CommunityEngagement", {
+                      communityId: item._id,
+                      communityName: item.name,
+                    })
+                  }
+                >
+                  <Text style={styles.viewEngagementLabel}>View events & quizzes</Text>
+                </Pressable>
                 {!isJoined ? (
                   <Pressable
                     style={[styles.joinBtn, joiningId === item._id && styles.joinBtnDisabled]}
@@ -319,6 +458,8 @@ const styles = StyleSheet.create({
   cardType: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textSecondary, marginTop: 2, textTransform: "capitalize" },
   cardMeta: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textMuted, marginTop: SPACING.xs },
   cardDesc: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textSecondary, marginTop: SPACING.sm },
+  viewEngagementBtn: { marginTop: SPACING.md },
+  viewEngagementLabel: { color: COLORS.primary, fontSize: TYPOGRAPHY.size.sm, fontWeight: TYPOGRAPHY.weight.semibold },
   joinBtn: { marginTop: SPACING.md, backgroundColor: COLORS.primary, borderRadius: RADIUS.sm, paddingVertical: SPACING.md, alignItems: "center" },
   joinBtnDisabled: { opacity: 0.7 },
   joinBtnLabel: { color: COLORS.primaryContrast, fontWeight: TYPOGRAPHY.weight.semibold },
@@ -326,4 +467,50 @@ const styles = StyleSheet.create({
   leaveBtn: { marginTop: SPACING.xl, paddingVertical: SPACING.md, alignItems: "center" },
   leaveBtnLabel: { color: COLORS.danger, fontWeight: TYPOGRAPHY.weight.semibold },
   empty: { padding: SPACING.xl, fontSize: TYPOGRAPHY.size.base, color: COLORS.textSecondary, textAlign: "center" },
+  engagementCta: {
+    marginBottom: SPACING.md,
+    backgroundColor: COLORS.primaryPale,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
+    borderRadius: RADIUS.md,
+    padding: SPACING.md,
+  },
+  engagementCtaTitle: {
+    fontSize: TYPOGRAPHY.size.base,
+    fontWeight: TYPOGRAPHY.weight.bold,
+    color: COLORS.primary,
+  },
+  engagementCtaSubtitle: {
+    marginTop: SPACING.xs,
+    fontSize: TYPOGRAPHY.size.sm,
+    color: COLORS.textSecondary,
+  },
+  engagementList: { gap: SPACING.sm, marginBottom: SPACING.md },
+  engagementCard: {
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: RADIUS.md,
+    padding: SPACING.md,
+  },
+  engagementTitle: {
+    fontSize: TYPOGRAPHY.size.base,
+    fontWeight: TYPOGRAPHY.weight.semibold,
+    color: COLORS.textPrimary,
+  },
+  engagementMeta: {
+    marginTop: SPACING.xs,
+    fontSize: TYPOGRAPHY.size.sm,
+    color: COLORS.textSecondary,
+  },
+  engagementSubtext: {
+    marginTop: 2,
+    fontSize: TYPOGRAPHY.size.xs,
+    color: COLORS.textMuted,
+  },
+  emptyEngagement: {
+    marginBottom: SPACING.md,
+    fontSize: TYPOGRAPHY.size.sm,
+    color: COLORS.textMuted,
+  },
 });

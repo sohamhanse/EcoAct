@@ -13,6 +13,8 @@ function buildTwitterCaption(payload: SharePayload): string {
       return `My community saved ${payload.data.co2Kg}kg CO₂ in ${payload.data.days} days on @EcoActApp 🌍 ${payload.data.memberCount} of us made it happen. #EcoAct #CommunityAction`;
     case "footprint":
       return `Reduced my carbon footprint by ${payload.data.improvementPercent}% this month on @EcoActApp 🌱 From ${payload.data.from}kg → ${payload.data.to}kg CO₂/year. #EcoAct #CarbonFootprint`;
+    case "puc":
+      return `Logged PUC compliance for ${payload.data.vehicleName} on @EcoActApp. +${payload.data.pointsAwarded} pts and cleaner air impact of ~${payload.data.co2ImpactKg}kg CO₂e/year. #EcoAct #PUC`;
   }
 }
 
@@ -24,6 +26,8 @@ function buildWhatsAppCaption(payload: SharePayload): string {
       return `My community just hit a huge goal on EcoAct — ${payload.data.co2Kg}kg CO₂ saved together! 🌍 Join us 🌿`;
     case "footprint":
       return `I cut my carbon footprint by ${payload.data.improvementPercent}% this month using EcoAct 🌱 Check it out!`;
+    case "puc":
+      return `I kept my vehicle (${payload.data.vehicleName}) PUC-compliant on EcoAct and earned +${payload.data.pointsAwarded} pts 🌿`;
   }
 }
 
@@ -35,6 +39,8 @@ function buildGeneralCaption(payload: SharePayload): string {
       return `My community saved ${payload.data.co2Kg}kg CO₂ on EcoAct! 🌍`;
     case "footprint":
       return `I reduced my carbon footprint by ${payload.data.improvementPercent}% on EcoAct 🌱`;
+    case "puc":
+      return `I logged PUC compliance for ${payload.data.vehicleName} on EcoAct 🌿`;
   }
 }
 

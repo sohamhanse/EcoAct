@@ -100,6 +100,18 @@ export function formatActivityText(
   const meta = activity.metadata ?? {};
   switch (activity.type) {
     case "mission_complete":
+      if ((meta.missionTitle ?? "").startsWith("Got PUC done for")) {
+        return {
+          text: `${userName} kept a vehicle PUC-compliant`,
+          subtext: `${meta.missionTitle ?? ""}  •  ${meta.missionCo2Saved ?? 0} kg CO₂e impact`,
+        };
+      }
+      if ((meta.missionTitle ?? "").startsWith("Reported a")) {
+        return {
+          text: `${userName} ${meta.missionTitle?.toLowerCase() ?? "reported a polluter"}`,
+          subtext: "Citizen pollution reporting  •  Transport",
+        };
+      }
       return {
         text: `${userName} completed ${meta.missionTitle ?? "a mission"}`,
         subtext: `Saved ${meta.missionCo2Saved ?? 0} kg CO₂  •  ${capitalize(meta.missionCategory ?? "")}`,

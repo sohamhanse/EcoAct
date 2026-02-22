@@ -1,5 +1,6 @@
 import type { Response } from "express";
 import mongoose from "mongoose";
+import { FootprintLog } from "../models/FootprintLog.model.js";
 import { Mission } from "../models/Mission.model.js";
 import { UserMission } from "../models/UserMission.model.js";
 import { User } from "../models/User.model.js";
@@ -28,8 +29,6 @@ export async function recommended(req: AuthRequest, res: Response): Promise<void
     error(res, "Not authenticated", "UNAUTHORIZED", 401);
     return;
   }
-  const FootprintLog = mongoose.model("FootprintLog");
-
   const latestLog = await FootprintLog.findOne({ userId: req.user.userId })
     .sort({ loggedAt: -1 })
     .lean();

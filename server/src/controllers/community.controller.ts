@@ -53,7 +53,13 @@ export async function join(req: AuthRequest, res: Response): Promise<void> {
     return;
   }
   if (user.communityId) {
-    await Community.findByIdAndUpdate(user.communityId, { $inc: { memberCount: -1 } });
+    await Community.findByIdAndUpdate(user.communityId, {
+      $inc: {
+        memberCount: -1,
+        totalPoints: -user.totalPoints,
+        totalCo2Saved: -user.totalCo2Saved,
+      },
+    });
   }
   await User.findByIdAndUpdate(req.user.userId, { communityId: id });
   await Community.findByIdAndUpdate(id, {

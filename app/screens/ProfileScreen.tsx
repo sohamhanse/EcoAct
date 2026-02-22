@@ -5,6 +5,8 @@ import { useNavigation } from "@react-navigation/native";
 import { useAuthStore } from "@/store/useAuthStore";
 import { getMe } from "@/api/auth.api";
 import { getCalculatorHistory } from "@/api/calculator.api";
+import { getPUCStats } from "@/api/puc.api";
+import { getMyPollutionReports } from "@/api/pollutionReport.api";
 import { useMilestones } from "@/hooks/useMilestones";
 import { MilestoneCard } from "@/components/milestones/MilestoneCard";
 import { ShareBottomSheet } from "@/components/sharing/ShareBottomSheet";
@@ -17,6 +19,8 @@ import { TYPOGRAPHY } from "@/constants/typography";
 const BADGE_IDS = [
   "first_step", "eco_starter", "green_warrior", "climate_hero",
   "week_streak", "month_streak", "community_builder",
+  "puc_first", "puc_5", "puc_10", "puc_streak_3",
+  "reporter_first", "reporter_10", "reporter_50", "reporter_100",
   "monthly_50_badge", "monthly_100_badge", "monthly_200_badge", "habit_builder_badge",
 ];
 
@@ -29,16 +33,39 @@ export default function ProfileScreen() {
   const [history, setHistory] = useState<Array<{ totalCo2: number; loggedAt: string }>>([]);
   const { active: milestones, history: milestoneHistory, loading: milestonesLoading } = useMilestones();
   const [sharePayload, setSharePayload] = useState<SharePayload | null>(null);
+  const [pucStats, setPucStats] = useState<{
+    totalLogs: number;
+    complianceRate: number;
+    totalCo2ImpactKg: number;
+    totalPointsEarned: number;
+    totalReports: number;
+  } | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
     try {
       const u = await getMe();
       useAuthStore.getState().setUser(u);
-      const h = await getCalculatorHistory();
+      const [h, stats, reports] = await Promise.all([
+        getCalculatorHistory(),
+        getPUCStats().catch(() => null),
+        getMyPollutionReports().catch(() => null),
+      ]);
       setHistory(h.logs?.slice(0, 5).map((l) => ({ totalCo2: l.totalCo2, loggedAt: l.loggedAt })) ?? []);
+      setPucStats(
+        stats
+          ? {
+              totalLogs: stats.totalLogs,
+              complianceRate: stats.complianceRate,
+              totalCo2ImpactKg: stats.totalCo2ImpactKg,
+              totalPointsEarned: stats.totalPointsEarned,
+              totalReports: reports?.reports?.length ?? 0,
+            }
+          : null,
+      );
     } catch {
       setHistory([]);
+      setPucStats(null);
     } finally {
       setLoading(false);
     }
@@ -121,6 +148,25 @@ export default function ProfileScreen() {
           </View>
         ))}
       </View>
+
+      <Text style={styles.sectionTitle}>PUC Compliance Record</Text>
+      {pucStats ? (
+        <View style={styles.pucCard}>
+          <Text style={styles.pucLine}>Total PUC logs: {pucStats.totalLogs}</Text>
+          <Text style={styles.pucLine}>On-time rate: {pucStats.complianceRate}%</Text>
+          <Text style={styles.pucLine}>CO2 prevented: ~{pucStats.totalCo2ImpactKg} kg/year equivalent</Text>
+          <Text style={styles.pucLine}>Points from PUC: {pucStats.totalPointsEarned} pts</Text>
+          <Text style={styles.pucLine}>Reports submitted: {pucStats.totalReports}</Text>
+          <Pressable
+            onPress={() => (navigation as unknown as { navigate: (name: string) => void }).navigate("PUC")}
+            style={styles.pucLinkWrap}
+          >
+            <Text style={styles.pucLink}>View My Vehicles</Text>
+          </Pressable>
+        </View>
+      ) : (
+        <Text style={styles.empty}>No PUC data yet. Start from the PUC tab.</Text>
+      )}
 
       <Text style={styles.sectionTitle}>Milestones</Text>
       {milestonesLoading ? (
@@ -207,6 +253,25 @@ const styles = StyleSheet.create({
   badgeLocked: { backgroundColor: COLORS.surface, borderColor: COLORS.border },
   badgeText: { fontSize: TYPOGRAPHY.size.md },
   badgeId: { fontSize: TYPOGRAPHY.size.xs, color: COLORS.textSecondary, marginTop: 2 },
+  pucCard: {
+    backgroundColor: COLORS.surface,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderRadius: RADIUS.md,
+    padding: SPACING.md,
+    marginBottom: SPACING.xl,
+  },
+  pucLine: {
+    fontSize: TYPOGRAPHY.size.sm,
+    color: COLORS.textSecondary,
+    marginBottom: SPACING.xs,
+  },
+  pucLinkWrap: { marginTop: SPACING.sm },
+  pucLink: {
+    color: COLORS.primary,
+    fontWeight: TYPOGRAPHY.weight.semibold,
+    fontSize: TYPOGRAPHY.size.sm,
+  },
   history: { marginBottom: SPACING.xl },
   historyRow: { flexDirection: "row", justifyContent: "space-between", paddingVertical: SPACING.sm, borderBottomWidth: 1, borderBottomColor: COLORS.border },
   historyDate: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textSecondary },

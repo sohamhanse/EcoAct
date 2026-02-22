@@ -6,6 +6,14 @@ export const BADGES = [
   { id: "week_streak", label: "7-Day Streak", threshold: 7, unit: "streak" },
   { id: "month_streak", label: "30-Day Streak", threshold: 30, unit: "streak" },
   { id: "community_builder", label: "Community Builder", threshold: 1, unit: "community_join" },
+  { id: "puc_first", label: "Clean Wheels", threshold: 1, unit: "custom" },
+  { id: "puc_5", label: "Compliance Champion", threshold: 5, unit: "custom" },
+  { id: "puc_10", label: "Pollution Fighter", threshold: 10, unit: "custom" },
+  { id: "puc_streak_3", label: "Triple Clean", threshold: 3, unit: "custom" },
+  { id: "reporter_first", label: "First Report", threshold: 1, unit: "custom" },
+  { id: "reporter_10", label: "Street Guardian", threshold: 10, unit: "custom" },
+  { id: "reporter_50", label: "Pollution Watchdog", threshold: 50, unit: "custom" },
+  { id: "reporter_100", label: "Clean Air Champion", threshold: 100, unit: "custom" },
 ] as const;
 
 export function getNewlyEarnedBadges(
