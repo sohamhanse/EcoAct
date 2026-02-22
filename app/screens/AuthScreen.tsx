@@ -2,6 +2,7 @@ import { setTokens } from "@/api/axiosInstance";
 import { COLORS } from "@/constants/colors";
 import { RADIUS } from "@/constants/radius";
 import { SPACING } from "@/constants/spacing";
+import { TYPOGRAPHY } from "@/constants/typography";
 import type { RootStackParamList } from "@/navigation/AppNavigator";
 import { GOOGLE_ISSUER, exchangeCodeForIdToken, makeRedirectUri } from "@/services/googleAuth";
 import type { ApiUser } from "@/src/types";
@@ -140,9 +141,11 @@ export default function AuthScreen({ navigation }: Props) {
           style={[styles.googleButton, loading && styles.buttonDisabled]}
           onPress={handleGoogleSignIn}
           disabled={loading}
+          accessibilityLabel="Continue with Google"
+          accessibilityRole="button"
         >
           {loading ? (
-            <ActivityIndicator color="#fff" />
+            <ActivityIndicator color={COLORS.primaryContrast} />
           ) : (
             <Text style={styles.googleButtonLabel}>Continue with Google</Text>
           )}
@@ -152,6 +155,8 @@ export default function AuthScreen({ navigation }: Props) {
           style={[styles.demoButton, loading && styles.buttonDisabled]}
           onPress={handleDemoLogin}
           disabled={loading}
+          accessibilityLabel="Demo login for development"
+          accessibilityRole="button"
         >
           <Text style={styles.demoButtonLabel}>Demo login (dev)</Text>
         </Pressable>
@@ -177,14 +182,14 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   title: {
-    fontSize: 24,
-    fontWeight: "700",
+    fontSize: TYPOGRAPHY.size.xl,
+    fontWeight: TYPOGRAPHY.weight.bold,
     color: COLORS.textPrimary,
   },
   subtitle: {
-    fontSize: 15,
+    fontSize: TYPOGRAPHY.size.base,
     color: COLORS.textSecondary,
-    marginTop: 8,
+    marginTop: SPACING.sm,
     marginBottom: SPACING.xl,
   },
   googleButton: {
@@ -204,18 +209,18 @@ const styles = StyleSheet.create({
     opacity: 0.7,
   },
   googleButtonLabel: {
-    color: "#fff",
-    fontWeight: "600",
-    fontSize: 16,
+    color: COLORS.primaryContrast,
+    fontWeight: TYPOGRAPHY.weight.semibold,
+    fontSize: TYPOGRAPHY.size.base,
   },
   demoButtonLabel: {
-    color: "#fff",
-    fontWeight: "600",
-    fontSize: 14,
+    color: COLORS.primaryContrast,
+    fontWeight: TYPOGRAPHY.weight.semibold,
+    fontSize: TYPOGRAPHY.size.sm,
   },
   error: {
     color: COLORS.danger,
-    fontSize: 13,
+    fontSize: TYPOGRAPHY.size.sm,
     marginTop: SPACING.sm,
   },
 });

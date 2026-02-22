@@ -4,9 +4,13 @@ import { useAuthStore } from "@/store/useAuthStore";
 import { getGlobalLeaderboard, getCommunityLeaderboard, getWeeklyLeaderboard } from "@/api/leaderboard.api";
 import type { LeaderboardEntry } from "@/src/types";
 import { COLORS } from "@/constants/colors";
+import { RADIUS } from "@/constants/radius";
 import { SPACING } from "@/constants/spacing";
+import { TYPOGRAPHY } from "@/constants/typography";
 
 type Tab = "global" | "community" | "weekly";
+
+const TAB_LABELS: Record<Tab, string> = { global: "Global", community: "Community", weekly: "Weekly" };
 
 export default function LeaderboardScreen() {
   const user = useAuthStore((s) => s.user);
@@ -57,8 +61,11 @@ export default function LeaderboardScreen() {
             key={t}
             style={[styles.tab, tab === t && styles.tabActive]}
             onPress={() => setTab(t)}
+            accessibilityLabel={`${TAB_LABELS[t]} leaderboard`}
+            accessibilityRole="tab"
+            accessibilityState={{ selected: tab === t }}
           >
-            <Text style={[styles.tabText, tab === t && styles.tabTextActive]}>{t}</Text>
+            <Text style={[styles.tabText, tab === t && styles.tabTextActive]}>{TAB_LABELS[t]}</Text>
           </Pressable>
         ))}
       </View>
@@ -81,7 +88,11 @@ export default function LeaderboardScreen() {
           contentContainerStyle={styles.list}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />}
           renderItem={({ item }) => (
-            <View style={[styles.row, user?._id === item._id && styles.rowHighlight]}>
+            <View
+              style={[styles.row, user?._id === item._id && styles.rowHighlight]}
+              accessibilityLabel={`Rank ${item.rank}, ${item.name}, ${item.totalPoints} points, ${item.totalCo2Saved} kg saved`}
+              accessibilityRole="listitem"
+            >
               <Text style={styles.rank}>{item.rank}</Text>
               <View style={styles.avatar}><Text style={styles.avatarText}>{(item.name ?? "?")[0]}</Text></View>
               <View style={styles.info}>
@@ -99,20 +110,20 @@ export default function LeaderboardScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   tabs: { flexDirection: "row", padding: SPACING.base, gap: SPACING.sm },
-  tab: { paddingVertical: 8, paddingHorizontal: 16, borderRadius: 8, backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border },
+  tab: { paddingVertical: SPACING.sm, paddingHorizontal: SPACING.base, borderRadius: RADIUS.sm, backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border },
   tabActive: { backgroundColor: COLORS.primaryPale, borderColor: COLORS.primary },
-  tabText: { fontSize: 14, color: COLORS.textSecondary },
-  tabTextActive: { color: COLORS.primary, fontWeight: "600" },
+  tabText: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textSecondary },
+  tabTextActive: { color: COLORS.primary, fontWeight: TYPOGRAPHY.weight.semibold },
   list: { padding: SPACING.base, paddingBottom: SPACING["3xl"] },
-  row: { flexDirection: "row", alignItems: "center", padding: SPACING.md, backgroundColor: COLORS.surface, borderRadius: 8, marginBottom: SPACING.sm, borderWidth: 1, borderColor: COLORS.border },
+  row: { flexDirection: "row", alignItems: "center", padding: SPACING.md, backgroundColor: COLORS.surface, borderRadius: RADIUS.sm, marginBottom: SPACING.sm, borderWidth: 1, borderColor: COLORS.border },
   rowHighlight: { borderColor: COLORS.primary, backgroundColor: COLORS.primaryPale },
-  rank: { width: 28, fontSize: 16, fontWeight: "700", color: COLORS.textSecondary },
-  avatar: { width: 40, height: 40, borderRadius: 20, backgroundColor: COLORS.primary, alignItems: "center", justifyContent: "center", marginRight: SPACING.sm },
-  avatarText: { color: "#fff", fontWeight: "700", fontSize: 16 },
+  rank: { width: SPACING["2xl"], fontSize: TYPOGRAPHY.size.base, fontWeight: TYPOGRAPHY.weight.bold, color: COLORS.textSecondary },
+  avatar: { width: SPACING["3xl"], height: SPACING["3xl"], borderRadius: RADIUS.lg, backgroundColor: COLORS.primary, alignItems: "center", justifyContent: "center", marginRight: SPACING.sm },
+  avatarText: { color: COLORS.primaryContrast, fontWeight: TYPOGRAPHY.weight.bold, fontSize: TYPOGRAPHY.size.base },
   info: { flex: 1 },
-  name: { fontSize: 16, fontWeight: "600", color: COLORS.textPrimary },
-  meta: { fontSize: 12, color: COLORS.textSecondary, marginTop: 2 },
+  name: { fontSize: TYPOGRAPHY.size.base, fontWeight: TYPOGRAPHY.weight.semibold, color: COLORS.textPrimary },
+  meta: { fontSize: TYPOGRAPHY.size.xs, color: COLORS.textSecondary, marginTop: 2 },
   emptyState: { padding: SPACING.xl, alignItems: "center" },
-  emptyText: { fontSize: 16, color: COLORS.textSecondary, textAlign: "center" },
-  emptySubtext: { fontSize: 14, color: COLORS.textMuted, marginTop: SPACING.sm, textAlign: "center" },
+  emptyText: { fontSize: TYPOGRAPHY.size.base, color: COLORS.textSecondary, textAlign: "center" },
+  emptySubtext: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textMuted, marginTop: SPACING.sm, textAlign: "center" },
 });

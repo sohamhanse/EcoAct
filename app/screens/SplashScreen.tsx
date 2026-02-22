@@ -1,5 +1,7 @@
 import { getAccessToken } from "@/api/axiosInstance";
 import { COLORS } from "@/constants/colors";
+import { SPACING } from "@/constants/spacing";
+import { TYPOGRAPHY } from "@/constants/typography";
 import type { RootStackParamList } from "@/navigation/AppNavigator";
 import { useAuthStore } from "@/store/useAuthStore";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -80,7 +82,7 @@ export default function SplashScreen({ navigation }: Props) {
   return (
     <View style={styles.container}>
       <Animated.View style={[styles.logoCircle, { transform: [{ scale: pulse }], opacity: fade }]}>
-        <Text style={styles.logoText}>ET</Text>
+        <Text style={styles.logoText}>EA</Text>
       </Animated.View>
       <Animated.Text style={[styles.title, { opacity: fade }]}>EcoAct</Animated.Text>
       <Animated.Text style={[styles.tagline, { opacity: fade }]}>Track. Act. Reduce.</Animated.Text>
@@ -95,33 +97,33 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: COLORS.primary,
-    paddingHorizontal: 24,
+    paddingHorizontal: SPACING.xl,
   },
   logoCircle: {
-    width: 94,
-    height: 94,
+    width: 96,
+    height: 96,
     borderRadius: 999,
     backgroundColor: COLORS.primaryLight,
     alignItems: "center",
     justifyContent: "center",
   },
   logoText: {
-    color: "#ecfdf5",
-    fontSize: 34,
-    fontWeight: "700",
+    color: COLORS.primaryContrast,
+    fontSize: TYPOGRAPHY.size["3xl"],
+    fontWeight: TYPOGRAPHY.weight.bold,
   },
   title: {
-    marginTop: 16,
-    color: "#ecfdf5",
-    fontSize: 34,
-    fontWeight: "700",
+    marginTop: SPACING.base,
+    color: COLORS.primaryContrast,
+    fontSize: TYPOGRAPHY.size["3xl"],
+    fontWeight: TYPOGRAPHY.weight.bold,
   },
   tagline: {
-    marginTop: 8,
-    color: "#d1fae5",
-    fontSize: 16,
+    marginTop: SPACING.sm,
+    color: COLORS.primaryContrastMuted,
+    fontSize: TYPOGRAPHY.size.base,
   },
   loader: {
-    marginTop: 20,
+    marginTop: SPACING.lg,
   },
 });

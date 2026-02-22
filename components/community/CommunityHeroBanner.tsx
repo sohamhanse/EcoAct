@@ -2,7 +2,9 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "@/constants/colors";
+import { RADIUS } from "@/constants/radius";
 import { SPACING } from "@/constants/spacing";
+import { TYPOGRAPHY } from "@/constants/typography";
 
 type Props = {
   name: string;
@@ -27,7 +29,7 @@ export const CommunityHeroBanner = React.memo(function CommunityHeroBanner({
   return (
     <View style={styles.gradient}>
       <View style={styles.iconRow}>
-        <Ionicons name={iconName} size={24} color="#fff" />
+        <Ionicons name={iconName} size={24} color={COLORS.primaryContrast} />
         <Text style={styles.name}>{name}</Text>
       </View>
       <Text style={styles.meta}>
@@ -41,7 +43,7 @@ export const CommunityHeroBanner = React.memo(function CommunityHeroBanner({
 const styles = StyleSheet.create({
   gradient: {
     backgroundColor: COLORS.primary,
-    borderRadius: 16,
+    borderRadius: RADIUS.lg,
     padding: SPACING.lg,
     marginBottom: SPACING.base,
   },
@@ -51,19 +53,19 @@ const styles = StyleSheet.create({
     gap: SPACING.sm,
   },
   name: {
-    fontSize: 22,
-    fontWeight: "700",
-    color: "#fff",
+    fontSize: TYPOGRAPHY.size.lg,
+    fontWeight: TYPOGRAPHY.weight.bold,
+    color: COLORS.primaryContrast,
   },
   meta: {
-    fontSize: 14,
-    color: "rgba(255,255,255,0.9)",
+    fontSize: TYPOGRAPHY.size.sm,
+    color: COLORS.primaryContrastMuted,
     marginTop: SPACING.xs,
   },
   co2: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: "#fff",
+    fontSize: TYPOGRAPHY.size.lg,
+    fontWeight: TYPOGRAPHY.weight.bold,
+    color: COLORS.primaryContrast,
     marginTop: SPACING.sm,
   },
 });

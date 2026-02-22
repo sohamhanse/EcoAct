@@ -10,8 +10,9 @@ import { MilestoneCard } from "@/components/milestones/MilestoneCard";
 import { ShareBottomSheet } from "@/components/sharing/ShareBottomSheet";
 import type { SharePayload } from "@/components/sharing/ShareCard";
 import { COLORS } from "@/constants/colors";
-import { SPACING } from "@/constants/spacing";
 import { RADIUS } from "@/constants/radius";
+import { SPACING } from "@/constants/spacing";
+import { TYPOGRAPHY } from "@/constants/typography";
 
 const BADGE_IDS = [
   "first_step", "eco_starter", "green_warrior", "climate_hero",
@@ -85,7 +86,12 @@ export default function ProfileScreen() {
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Profile</Text>
-        <Pressable onPress={openFootprintShare} style={styles.shareIcon}>
+        <Pressable
+          onPress={openFootprintShare}
+          style={styles.shareIcon}
+          accessibilityLabel="Share your footprint progress"
+          accessibilityRole="button"
+        >
           <Ionicons name="share-social-outline" size={24} color={COLORS.primary} />
         </Pressable>
       </View>
@@ -153,7 +159,12 @@ export default function ProfileScreen() {
         </View>
       )}
 
-      <Pressable style={styles.signOut} onPress={handleSignOut}>
+      <Pressable
+        style={({ pressed }) => [styles.signOut, pressed && { opacity: 0.8 }]}
+        onPress={handleSignOut}
+        accessibilityLabel="Sign out"
+        accessibilityRole="button"
+      >
         <Text style={styles.signOutLabel}>Sign out</Text>
       </Pressable>
 
@@ -176,35 +187,35 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.md,
     paddingHorizontal: SPACING.base,
   },
-  headerTitle: { fontSize: 20, fontWeight: "700", color: COLORS.textPrimary },
+  headerTitle: { fontSize: TYPOGRAPHY.size.lg, fontWeight: TYPOGRAPHY.weight.bold, color: COLORS.textPrimary },
   shareIcon: { padding: SPACING.sm },
   profileRow: { flexDirection: "row", alignItems: "center", marginBottom: SPACING.xl },
-  avatar: { width: 64, height: 64, borderRadius: 32, backgroundColor: COLORS.primary, alignItems: "center", justifyContent: "center" },
-  avatarText: { color: "#fff", fontSize: 24, fontWeight: "700" },
+  avatar: { width: SPACING["5xl"], height: SPACING["5xl"], borderRadius: RADIUS.full, backgroundColor: COLORS.primary, alignItems: "center", justifyContent: "center" },
+  avatarText: { color: COLORS.primaryContrast, fontSize: TYPOGRAPHY.size.xl, fontWeight: TYPOGRAPHY.weight.bold },
   profileInfo: { marginLeft: SPACING.lg },
-  name: { fontSize: 20, fontWeight: "700", color: COLORS.textPrimary },
-  email: { fontSize: 14, color: COLORS.textSecondary, marginTop: 2 },
-  level: { fontSize: 13, color: COLORS.textMuted, marginTop: 4 },
+  name: { fontSize: TYPOGRAPHY.size.lg, fontWeight: TYPOGRAPHY.weight.bold, color: COLORS.textPrimary },
+  email: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textSecondary, marginTop: 2 },
+  level: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textMuted, marginTop: SPACING.xs },
   statsRow: { flexDirection: "row", gap: SPACING.sm, marginBottom: SPACING.xl },
   stat: { flex: 1, backgroundColor: COLORS.surface, borderRadius: RADIUS.md, padding: SPACING.md, borderWidth: 1, borderColor: COLORS.border },
-  statVal: { fontSize: 20, fontWeight: "700", color: COLORS.primary },
-  statLabel: { fontSize: 12, color: COLORS.textSecondary, marginTop: 2 },
-  sectionTitle: { fontSize: 16, fontWeight: "600", color: COLORS.textPrimary, marginBottom: SPACING.sm },
+  statVal: { fontSize: TYPOGRAPHY.size.lg, fontWeight: TYPOGRAPHY.weight.bold, color: COLORS.primary },
+  statLabel: { fontSize: TYPOGRAPHY.size.xs, color: COLORS.textSecondary, marginTop: 2 },
+  sectionTitle: { fontSize: TYPOGRAPHY.size.base, fontWeight: TYPOGRAPHY.weight.semibold, color: COLORS.textPrimary, marginBottom: SPACING.sm },
   badgesGrid: { flexDirection: "row", flexWrap: "wrap", gap: SPACING.sm, marginBottom: SPACING.xl },
   badge: { width: "30%", minWidth: 90, padding: SPACING.sm, borderRadius: RADIUS.sm, alignItems: "center", borderWidth: 1 },
   badgeEarned: { backgroundColor: COLORS.primaryPale, borderColor: COLORS.primary },
   badgeLocked: { backgroundColor: COLORS.surface, borderColor: COLORS.border },
-  badgeText: { fontSize: 18 },
-  badgeId: { fontSize: 10, color: COLORS.textSecondary, marginTop: 2 },
+  badgeText: { fontSize: TYPOGRAPHY.size.md },
+  badgeId: { fontSize: TYPOGRAPHY.size.xs, color: COLORS.textSecondary, marginTop: 2 },
   history: { marginBottom: SPACING.xl },
-  historyRow: { flexDirection: "row", justifyContent: "space-between", paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: COLORS.border },
-  historyDate: { fontSize: 14, color: COLORS.textSecondary },
-  historyVal: { fontSize: 14, fontWeight: "600", color: COLORS.textPrimary },
-  empty: { fontSize: 14, color: COLORS.textMuted, marginBottom: SPACING.lg },
+  historyRow: { flexDirection: "row", justifyContent: "space-between", paddingVertical: SPACING.sm, borderBottomWidth: 1, borderBottomColor: COLORS.border },
+  historyDate: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textSecondary },
+  historyVal: { fontSize: TYPOGRAPHY.size.sm, fontWeight: TYPOGRAPHY.weight.semibold, color: COLORS.textPrimary },
+  empty: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textMuted, marginBottom: SPACING.lg },
   milestonesRow: { flexDirection: "row", flexWrap: "wrap", gap: SPACING.sm, marginBottom: SPACING.lg },
   milestoneHistory: { marginBottom: SPACING.lg },
   completed: { color: COLORS.success },
   failed: { color: COLORS.textMuted },
   signOut: { paddingVertical: SPACING.md, alignItems: "center" },
-  signOutLabel: { color: COLORS.danger, fontWeight: "600", fontSize: 16 },
+  signOutLabel: { color: COLORS.danger, fontWeight: TYPOGRAPHY.weight.semibold, fontSize: TYPOGRAPHY.size.base },
 });

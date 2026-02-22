@@ -2,6 +2,14 @@ export const COLORS = {
   primary: "#1A6B3C",
   primaryLight: "#2D9E5F",
   primaryPale: "#E8F5EE",
+  /** Light text on primary background (e.g. splash, hero banners) */
+  primaryContrast: "#ECFDF5",
+  /** Muted light text on primary */
+  primaryContrastMuted: "#D1FAE5",
+  /** Semi-transparent overlay for modals */
+  overlay: "rgba(0,0,0,0.5)",
+  /** Primary with alpha for subtle borders */
+  primaryBorderSubtle: "#1A6B3C40",
   accent: "#00C896",
   accentWarm: "#F4A261",
   success: "#22C55E",

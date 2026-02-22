@@ -4,19 +4,13 @@ import {
     calculateOffsetCost,
 } from "@/constants/offsetProviders";
 import { RADIUS } from "@/constants/radius";
+import { SHADOWS } from "@/constants/shadows";
 import { SPACING } from "@/constants/spacing";
+import { TYPOGRAPHY } from "@/constants/typography";
 import { useNavigation } from "@react-navigation/native";
 import * as WebBrowser from "expo-web-browser";
 import React from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
-
-const shadowSm = {
-  shadowColor: "#000",
-  shadowOffset: { width: 0, height: 1 },
-  shadowOpacity: 0.05,
-  shadowRadius: 4,
-  elevation: 2,
-};
 
 type Props = {
   co2Kg: number;
@@ -54,7 +48,7 @@ export function OffsetSection({ co2Kg }: Props) {
       {OFFSET_PROVIDERS.map((p) => {
         const costPerYear = Math.round(co2Kg * p.pricePerKgInr);
         return (
-          <View key={p.id} style={[styles.providerCard, shadowSm]}>
+          <View key={p.id} style={[styles.providerCard, SHADOWS.sm]}>
             <View style={styles.providerHeader}>
               <Text style={styles.providerName}>{p.name}</Text>
               {p.indiaFocused && (
@@ -111,37 +105,37 @@ const styles = StyleSheet.create({
   },
   dividerLabel: {
     marginHorizontal: SPACING.md,
-    fontSize: 11,
+    fontSize: TYPOGRAPHY.size.xs,
     color: COLORS.textMuted,
     letterSpacing: 0.5,
   },
   heroTitle: {
-    fontSize: 15,
+    fontSize: TYPOGRAPHY.size.base,
     color: COLORS.textPrimary,
     textAlign: "center",
   },
   heroSub: {
-    fontSize: 14,
+    fontSize: TYPOGRAPHY.size.sm,
     color: COLORS.textSecondary,
     textAlign: "center",
-    marginTop: 4,
+    marginTop: SPACING.xs,
   },
   heroCost: {
-    fontSize: 36,
-    fontWeight: "800",
+    fontSize: TYPOGRAPHY.size["3xl"],
+    fontWeight: TYPOGRAPHY.weight.extrabold,
     color: COLORS.primary,
     textAlign: "center",
     marginVertical: SPACING.sm,
-    fontFamily: "monospace",
+    fontFamily: TYPOGRAPHY.fontFamily.mono,
   },
   trees: {
-    fontSize: 14,
+    fontSize: TYPOGRAPHY.size.sm,
     color: COLORS.accent,
     textAlign: "center",
     marginBottom: SPACING.lg,
   },
   providersTitle: {
-    fontSize: 12,
+    fontSize: TYPOGRAPHY.size.xs,
     color: COLORS.textMuted,
     letterSpacing: 0.5,
     marginBottom: SPACING.md,
@@ -160,30 +154,30 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   providerName: {
-    fontSize: 16,
-    fontWeight: "700",
+    fontSize: TYPOGRAPHY.size.base,
+    fontWeight: TYPOGRAPHY.weight.bold,
     color: COLORS.textPrimary,
   },
   indiaBadge: {
     backgroundColor: COLORS.primary,
-    paddingHorizontal: 8,
+    paddingHorizontal: SPACING.sm,
     paddingVertical: 2,
     borderRadius: RADIUS.sm,
   },
   indiaBadgeText: {
-    fontSize: 10,
-    color: "#fff",
-    fontWeight: "600",
+    fontSize: TYPOGRAPHY.size.xs,
+    color: COLORS.primaryContrast,
+    fontWeight: TYPOGRAPHY.weight.semibold,
   },
   providerDesc: {
-    fontSize: 13,
+    fontSize: TYPOGRAPHY.size.sm,
     color: COLORS.textSecondary,
-    marginTop: 4,
+    marginTop: SPACING.xs,
   },
   verification: {
-    fontSize: 11,
+    fontSize: TYPOGRAPHY.size.xs,
     color: COLORS.accent,
-    marginTop: 4,
+    marginTop: SPACING.xs,
   },
   providerFooter: {
     flexDirection: "row",
@@ -192,17 +186,17 @@ const styles = StyleSheet.create({
     marginTop: SPACING.sm,
   },
   price: {
-    fontSize: 13,
+    fontSize: TYPOGRAPHY.size.sm,
     color: COLORS.textSecondary,
   },
   offsetBtn: {},
   offsetBtnText: {
-    fontSize: 14,
-    fontWeight: "600",
+    fontSize: TYPOGRAPHY.size.sm,
+    fontWeight: TYPOGRAPHY.weight.semibold,
     color: COLORS.primary,
   },
   disclaimer: {
-    fontSize: 11,
+    fontSize: TYPOGRAPHY.size.xs,
     color: COLORS.textMuted,
     fontStyle: "italic",
     textAlign: "center",
@@ -214,17 +208,17 @@ const styles = StyleSheet.create({
     padding: SPACING.lg,
     marginTop: SPACING.lg,
     borderWidth: 1,
-    borderColor: COLORS.primary + "40",
+    borderColor: COLORS.primaryBorderSubtle,
   },
   reduceTitle: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: TYPOGRAPHY.size.base,
+    fontWeight: TYPOGRAPHY.weight.bold,
     color: COLORS.primary,
   },
   reduceBody: {
-    fontSize: 14,
+    fontSize: TYPOGRAPHY.size.sm,
     color: COLORS.textPrimary,
-    marginTop: 4,
+    marginTop: SPACING.xs,
   },
   missionsBtn: {
     marginTop: SPACING.md,
@@ -234,8 +228,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   missionsBtnLabel: {
-    color: "#fff",
-    fontWeight: "600",
-    fontSize: 16,
+    color: COLORS.primaryContrast,
+    fontWeight: TYPOGRAPHY.weight.semibold,
+    fontSize: TYPOGRAPHY.size.base,
   },
 });

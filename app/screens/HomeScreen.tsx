@@ -22,8 +22,9 @@ import { MilestoneCard } from "@/components/milestones/MilestoneCard";
 import { ShareBottomSheet } from "@/components/sharing/ShareBottomSheet";
 import type { SharePayload } from "@/components/sharing/ShareCard";
 import { COLORS } from "@/constants/colors";
-import { SPACING } from "@/constants/spacing";
 import { RADIUS } from "@/constants/radius";
+import { SPACING } from "@/constants/spacing";
+import { TYPOGRAPHY } from "@/constants/typography";
 
 type Nav = NativeStackNavigationProp<MainStackParamList>;
 
@@ -143,11 +144,17 @@ export default function HomeScreen() {
       ) : (
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.missionScroll}>
           {missions.slice(0, 3).map((m) => (
-            <View key={m._id} style={styles.missionCard}>
+            <Pressable
+              key={m._id}
+              style={({ pressed }) => [styles.missionCard, pressed && styles.missionCardPressed]}
+              onPress={() => navigation.navigate("Missions")}
+              accessibilityLabel={`${m.title}, ${m.co2Saved} kg CO₂ saved, ${m.basePoints} points`}
+              accessibilityRole="button"
+            >
               <Text style={styles.missionTitle}>{m.title}</Text>
               <Text style={styles.missionCo2}>−{m.co2Saved} kg CO₂</Text>
               <Text style={styles.missionPoints}>{m.basePoints} pts · {m.difficulty}</Text>
-            </View>
+            </Pressable>
           ))}
         </ScrollView>
       )}
@@ -165,7 +172,12 @@ export default function HomeScreen() {
         <Text style={styles.emptyMilestones}>Complete missions to unlock milestones</Text>
       )}
 
-      <Pressable style={styles.communityCard} onPress={() => navigation.navigate("Community")}>
+      <Pressable
+        style={({ pressed }) => [styles.communityCard, pressed && { opacity: 0.8 }]}
+        onPress={() => navigation.navigate("Community")}
+        accessibilityLabel={mine ? `Community: ${mine.name}, ${mine.totalCo2Saved} kg saved` : "Join a community"}
+        accessibilityRole="button"
+      >
         <Text style={styles.communityTitle}>Community</Text>
         <Text style={styles.communitySub}>
           {mine ? `${mine.name} · ${mine.totalCo2Saved} kg saved` : "Join a community"}
@@ -184,8 +196,8 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   content: { padding: SPACING.base, paddingBottom: SPACING["3xl"] },
-  greeting: { fontSize: 22, fontWeight: "700", color: COLORS.textPrimary },
-  date: { fontSize: 14, color: COLORS.textSecondary, marginTop: 4 },
+  greeting: { fontSize: TYPOGRAPHY.size.lg, fontWeight: TYPOGRAPHY.weight.bold, color: COLORS.textPrimary },
+  date: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textSecondary, marginTop: SPACING.xs },
   heroCard: {
     marginTop: SPACING.lg,
     backgroundColor: COLORS.surface,
@@ -194,21 +206,21 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
   },
-  heroLabel: { fontSize: 13, color: COLORS.textSecondary },
-  heroValue: { fontSize: 28, fontWeight: "700", color: COLORS.primary, marginTop: 4 },
-  heroSub: { fontSize: 14, color: COLORS.textSecondary, marginTop: 4 },
-  improvement: { fontSize: 14, color: COLORS.success, marginTop: 4 },
+  heroLabel: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textSecondary },
+  heroValue: { fontSize: TYPOGRAPHY.size.xl, fontWeight: TYPOGRAPHY.weight.bold, color: COLORS.primary, marginTop: SPACING.xs },
+  heroSub: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textSecondary, marginTop: SPACING.xs },
+  improvement: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.success, marginTop: SPACING.xs },
   progressWrap: {
-    height: 8,
+    height: SPACING.sm,
     backgroundColor: COLORS.primaryPale,
-    borderRadius: 4,
+    borderRadius: RADIUS.sm,
     marginTop: SPACING.md,
     overflow: "hidden",
   },
-  progressFill: { height: "100%", backgroundColor: COLORS.primary, borderRadius: 4 },
-  progressLabel: { fontSize: 11, color: COLORS.textMuted, marginTop: 4 },
+  progressFill: { height: "100%", backgroundColor: COLORS.primary, borderRadius: RADIUS.sm },
+  progressLabel: { fontSize: TYPOGRAPHY.size.xs, color: COLORS.textMuted, marginTop: SPACING.xs },
   shareProgress: { marginTop: SPACING.sm },
-  shareProgressLabel: { fontSize: 14, color: COLORS.primary, fontWeight: "600" },
+  shareProgressLabel: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.primary, fontWeight: TYPOGRAPHY.weight.semibold },
   statsRow: { flexDirection: "row", gap: SPACING.sm, marginTop: SPACING.lg },
   statBox: {
     flex: 1,
@@ -218,12 +230,12 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
   },
-  statValue: { fontSize: 20, fontWeight: "700", color: COLORS.textPrimary },
-  statLabel: { fontSize: 12, color: COLORS.textSecondary, marginTop: 2 },
-  sectionTitle: { fontSize: 17, fontWeight: "600", color: COLORS.textPrimary, marginTop: SPACING.xl },
+  statValue: { fontSize: TYPOGRAPHY.size.lg, fontWeight: TYPOGRAPHY.weight.bold, color: COLORS.textPrimary },
+  statLabel: { fontSize: TYPOGRAPHY.size.xs, color: COLORS.textSecondary, marginTop: 2 },
+  sectionTitle: { fontSize: TYPOGRAPHY.size.md, fontWeight: TYPOGRAPHY.weight.semibold, color: COLORS.textPrimary, marginTop: SPACING.xl },
   missionScroll: { marginTop: SPACING.sm, marginHorizontal: -SPACING.base },
   milestoneScroll: { marginTop: SPACING.sm, marginHorizontal: -SPACING.base, gap: SPACING.sm },
-  emptyMilestones: { fontSize: 13, color: COLORS.textMuted, marginTop: SPACING.sm },
+  emptyMilestones: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textMuted, marginTop: SPACING.sm },
   missionCard: {
     width: 160,
     marginLeft: SPACING.base,
@@ -233,17 +245,18 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: COLORS.border,
   },
-  missionTitle: { fontSize: 14, fontWeight: "600", color: COLORS.textPrimary },
-  missionCo2: { fontSize: 13, color: COLORS.success, marginTop: 4 },
-  missionPoints: { fontSize: 12, color: COLORS.textMuted, marginTop: 2 },
+  missionCardPressed: { opacity: 0.8 },
+  missionTitle: { fontSize: TYPOGRAPHY.size.sm, fontWeight: TYPOGRAPHY.weight.semibold, color: COLORS.textPrimary },
+  missionCo2: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.success, marginTop: SPACING.xs },
+  missionPoints: { fontSize: TYPOGRAPHY.size.xs, color: COLORS.textMuted, marginTop: 2 },
   communityCard: {
     marginTop: SPACING.xl,
     backgroundColor: COLORS.primaryPale,
     borderRadius: RADIUS.md,
     padding: SPACING.lg,
     borderWidth: 1,
-    borderColor: COLORS.primary + "40",
+    borderColor: COLORS.primaryBorderSubtle,
   },
-  communityTitle: { fontSize: 16, fontWeight: "600", color: COLORS.primary },
-  communitySub: { fontSize: 14, color: COLORS.textSecondary, marginTop: 4 },
+  communityTitle: { fontSize: TYPOGRAPHY.size.base, fontWeight: TYPOGRAPHY.weight.semibold, color: COLORS.primary },
+  communitySub: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textSecondary, marginTop: SPACING.xs },
 });

@@ -3,16 +3,10 @@ import { View, Text, StyleSheet } from "react-native";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 import type { CommunityChallengeResponse } from "@/src/types";
 import { COLORS } from "@/constants/colors";
-import { SPACING } from "@/constants/spacing";
 import { RADIUS } from "@/constants/radius";
-
-const shadowMd = {
-  shadowColor: "#000",
-  shadowOffset: { width: 0, height: 4 },
-  shadowOpacity: 0.08,
-  shadowRadius: 12,
-  elevation: 4,
-};
+import { SHADOWS } from "@/constants/shadows";
+import { SPACING } from "@/constants/spacing";
+import { TYPOGRAPHY } from "@/constants/typography";
 
 type Props = {
   challenge: CommunityChallengeResponse | null;
@@ -104,9 +98,9 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.primaryPale,
     borderRadius: RADIUS.lg,
     padding: SPACING.lg,
-    borderLeftWidth: 4,
+    borderLeftWidth: SPACING.xs,
     borderLeftColor: COLORS.primary,
-    ...shadowMd,
+    ...SHADOWS.md,
   },
   cardCompleted: {
     borderLeftColor: COLORS.accent,
@@ -122,12 +116,12 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.sm,
   },
   emoji: {
-    fontSize: 18,
+    fontSize: TYPOGRAPHY.size.md,
     marginRight: SPACING.sm,
   },
   badge: {
-    fontSize: 11,
-    fontWeight: "700",
+    fontSize: TYPOGRAPHY.size.xs,
+    fontWeight: TYPOGRAPHY.weight.bold,
     color: COLORS.primary,
     letterSpacing: 0.5,
   },
@@ -142,20 +136,20 @@ const styles = StyleSheet.create({
   },
   countdown: {
     marginLeft: "auto",
-    fontSize: 12,
+    fontSize: TYPOGRAPHY.size.xs,
     color: COLORS.textSecondary,
   },
   countdownUrgent: {
     color: COLORS.danger,
   },
   title: {
-    fontSize: 17,
-    fontWeight: "700",
+    fontSize: TYPOGRAPHY.size.md,
+    fontWeight: TYPOGRAPHY.weight.bold,
     color: COLORS.textPrimary,
     marginBottom: SPACING.xs,
   },
   description: {
-    fontSize: 13,
+    fontSize: TYPOGRAPHY.size.sm,
     color: COLORS.textSecondary,
     marginBottom: SPACING.md,
   },
@@ -172,21 +166,21 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.full,
   },
   stats: {
-    fontSize: 13,
+    fontSize: TYPOGRAPHY.size.sm,
     color: COLORS.textSecondary,
   },
   contributors: {
-    fontSize: 12,
+    fontSize: TYPOGRAPHY.size.xs,
     color: COLORS.textMuted,
     marginTop: SPACING.xs,
   },
   completedAt: {
-    fontSize: 11,
+    fontSize: TYPOGRAPHY.size.xs,
     color: COLORS.textMuted,
     marginTop: SPACING.sm,
   },
   failedCopy: {
-    fontSize: 12,
+    fontSize: TYPOGRAPHY.size.xs,
     color: COLORS.textMuted,
     marginTop: SPACING.sm,
   },

@@ -2,17 +2,11 @@ import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import type { ActiveMilestone } from "@/api/milestone.api";
 import { COLORS } from "@/constants/colors";
-import { SPACING } from "@/constants/spacing";
-import { RADIUS } from "@/constants/radius";
 import { MILESTONE_ICONS } from "@/constants/milestones";
-
-const shadowMd = {
-  shadowColor: "#000",
-  shadowOffset: { width: 0, height: 4 },
-  shadowOpacity: 0.08,
-  shadowRadius: 12,
-  elevation: 4,
-};
+import { RADIUS } from "@/constants/radius";
+import { SHADOWS } from "@/constants/shadows";
+import { SPACING } from "@/constants/spacing";
+import { TYPOGRAPHY } from "@/constants/typography";
 
 type Props = {
   milestone: ActiveMilestone;
@@ -26,7 +20,7 @@ export const MilestoneCard = React.memo(function MilestoneCard({ milestone }: Pr
   const unitLabel = unit === "kg_co2" ? "kg" : unit === "missions" ? "missions" : "days";
 
   return (
-    <View style={[styles.card, shadowMd]}>
+    <View style={[styles.card, SHADOWS.md]}>
       <View style={styles.header}>
         <Text style={styles.period}>{milestone.periodLabel.toUpperCase()}</Text>
         <Text style={[styles.daysLeft, isUrgent && styles.daysLeftUrgent]}>
@@ -67,12 +61,12 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.sm,
   },
   period: {
-    fontSize: 10,
+    fontSize: TYPOGRAPHY.size.xs,
     color: COLORS.textMuted,
     letterSpacing: 0.1,
   },
   daysLeft: {
-    fontSize: 11,
+    fontSize: TYPOGRAPHY.size.xs,
     color: COLORS.textMuted,
   },
   daysLeftUrgent: {
@@ -82,16 +76,16 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.sm,
   },
   icon: {
-    fontSize: 24,
-    marginBottom: 4,
+    fontSize: TYPOGRAPHY.size.xl,
+    marginBottom: SPACING.xs,
   },
   label: {
-    fontSize: 15,
-    fontWeight: "700",
+    fontSize: TYPOGRAPHY.size.base,
+    fontWeight: TYPOGRAPHY.weight.bold,
     color: COLORS.textPrimary,
   },
   desc: {
-    fontSize: 12,
+    fontSize: TYPOGRAPHY.size.xs,
     color: COLORS.textSecondary,
     marginTop: 2,
   },
@@ -99,7 +93,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.xs,
   },
   progressBar: {
-    height: 8,
+    height: SPACING.sm,
     backgroundColor: COLORS.primaryPale,
     borderRadius: RADIUS.full,
     overflow: "hidden",
@@ -110,13 +104,13 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.full,
   },
   progressText: {
-    fontSize: 12,
+    fontSize: TYPOGRAPHY.size.xs,
     color: COLORS.textSecondary,
-    marginTop: 4,
+    marginTop: SPACING.xs,
   },
   bonus: {
-    fontSize: 11,
+    fontSize: TYPOGRAPHY.size.xs,
     color: COLORS.primary,
-    fontWeight: "600",
+    fontWeight: TYPOGRAPHY.weight.semibold,
   },
 });

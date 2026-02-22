@@ -23,8 +23,9 @@ import {
 } from "@/constants/emissionFactors";
 import { OffsetSection } from "@/components/calculator/OffsetSection";
 import { COLORS } from "@/constants/colors";
-import { SPACING } from "@/constants/spacing";
 import { RADIUS } from "@/constants/radius";
+import { SPACING } from "@/constants/spacing";
+import { TYPOGRAPHY } from "@/constants/typography";
 
 const STEPS = 10;
 const INDIA_AVG = 1700;
@@ -166,24 +167,29 @@ export default function CalculatorScreen() {
         <View style={styles.breakdown}>
           <Text style={styles.breakdownTitle}>Breakdown</Text>
           <View style={styles.breakdownRow}>
-            <Text>Transport</Text>
-            <Text>{breakdown.transport} kg</Text>
+            <Text style={styles.breakdownLabel}>Transport</Text>
+            <Text style={styles.breakdownValue}>{breakdown.transport} kg</Text>
           </View>
           <View style={styles.breakdownRow}>
-            <Text>Food</Text>
-            <Text>{breakdown.food} kg</Text>
+            <Text style={styles.breakdownLabel}>Food</Text>
+            <Text style={styles.breakdownValue}>{breakdown.food} kg</Text>
           </View>
           <View style={styles.breakdownRow}>
-            <Text>Energy</Text>
-            <Text>{breakdown.energy} kg</Text>
+            <Text style={styles.breakdownLabel}>Energy</Text>
+            <Text style={styles.breakdownValue}>{breakdown.energy} kg</Text>
           </View>
           <View style={styles.breakdownRow}>
-            <Text>Shopping</Text>
-            <Text>{breakdown.shopping} kg</Text>
+            <Text style={styles.breakdownLabel}>Shopping</Text>
+            <Text style={styles.breakdownValue}>{breakdown.shopping} kg</Text>
           </View>
         </View>
         <OffsetSection co2Kg={total} />
-        <Pressable style={styles.cta} onPress={() => setDone(false)}>
+        <Pressable
+          style={({ pressed }) => [styles.cta, pressed && { opacity: 0.8 }]}
+          onPress={() => setDone(false)}
+          accessibilityLabel="Recalculate footprint"
+          accessibilityRole="button"
+        >
           <Text style={styles.ctaLabel}>Recalculate</Text>
         </Pressable>
       </ScrollView>
@@ -482,18 +488,18 @@ export default function CalculatorScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   content: { padding: SPACING.base, paddingBottom: SPACING["3xl"] },
-  progressText: { fontSize: 13, color: COLORS.textSecondary },
+  progressText: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textSecondary },
   progressBar: {
-    height: 4,
+    height: SPACING.xs,
     backgroundColor: COLORS.border,
-    borderRadius: 2,
-    marginTop: 4,
+    borderRadius: RADIUS.sm,
+    marginTop: SPACING.xs,
     overflow: "hidden",
   },
-  progressFill: { height: "100%", backgroundColor: COLORS.primary, borderRadius: 2 },
-  q: { fontSize: 18, fontWeight: "600", color: COLORS.textPrimary, marginTop: SPACING.lg },
-  val: { fontSize: 24, fontWeight: "700", color: COLORS.primary, marginVertical: SPACING.sm },
-  hint: { fontSize: 12, color: COLORS.textMuted, marginTop: SPACING.xs },
+  progressFill: { height: "100%", backgroundColor: COLORS.primary, borderRadius: RADIUS.sm },
+  q: { fontSize: TYPOGRAPHY.size.md, fontWeight: TYPOGRAPHY.weight.semibold, color: COLORS.textPrimary, marginTop: SPACING.lg },
+  val: { fontSize: TYPOGRAPHY.size.xl, fontWeight: TYPOGRAPHY.weight.bold, color: COLORS.primary, marginVertical: SPACING.sm },
+  hint: { fontSize: TYPOGRAPHY.size.xs, color: COLORS.textMuted, marginTop: SPACING.xs },
   chipRow: { flexDirection: "row", flexWrap: "wrap", gap: SPACING.sm, marginTop: SPACING.sm },
   chipGrid: { flexDirection: "row", flexWrap: "wrap", gap: SPACING.sm, marginTop: SPACING.sm },
   chip: {
@@ -505,16 +511,16 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   chipActive: { backgroundColor: COLORS.primaryPale, borderColor: COLORS.primary },
-  chipText: { fontSize: 15, color: COLORS.textPrimary },
-  chipTextActive: { color: COLORS.primary, fontWeight: "600" },
+  chipText: { fontSize: TYPOGRAPHY.size.base, color: COLORS.textPrimary },
+  chipTextActive: { color: COLORS.primary, fontWeight: TYPOGRAPHY.weight.semibold },
   preview: {
     marginTop: SPACING.xl,
     padding: SPACING.md,
     backgroundColor: COLORS.primaryPale,
     borderRadius: RADIUS.md,
   },
-  previewLabel: { fontSize: 12, color: COLORS.textSecondary },
-  previewVal: { fontSize: 20, fontWeight: "700", color: COLORS.primary },
+  previewLabel: { fontSize: TYPOGRAPHY.size.xs, color: COLORS.textSecondary },
+  previewVal: { fontSize: TYPOGRAPHY.size.lg, fontWeight: TYPOGRAPHY.weight.bold, color: COLORS.primary },
   buttons: { flexDirection: "row", gap: SPACING.sm, marginTop: SPACING.xl },
   primaryBtn: {
     flex: 1,
@@ -523,21 +529,30 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.md,
     alignItems: "center",
   },
-  primaryBtnLabel: { color: "#fff", fontWeight: "600", fontSize: 16 },
+  primaryBtnLabel: { color: COLORS.primaryContrast, fontWeight: TYPOGRAPHY.weight.semibold, fontSize: TYPOGRAPHY.size.base },
   secondaryBtn: { paddingVertical: SPACING.md, paddingHorizontal: SPACING.lg, justifyContent: "center" },
-  secondaryBtnLabel: { color: COLORS.primary, fontWeight: "600" },
-  resultTitle: { fontSize: 20, fontWeight: "700", color: COLORS.textPrimary },
-  resultValue: { fontSize: 32, fontWeight: "700", color: COLORS.primary, marginTop: SPACING.sm },
-  vsAvg: { fontSize: 14, color: COLORS.textSecondary, marginTop: SPACING.sm },
-  gridFactor: { fontSize: 13, color: COLORS.textSecondary, marginTop: SPACING.sm },
-  gridSource: { fontSize: 11, color: COLORS.textMuted, marginTop: 2 },
-  breakdown: { marginTop: SPACING.xl },
-  breakdownTitle: { fontSize: 16, fontWeight: "600", marginBottom: SPACING.sm },
+  secondaryBtnLabel: { color: COLORS.primary, fontWeight: TYPOGRAPHY.weight.semibold },
+  resultTitle: { fontSize: TYPOGRAPHY.size.lg, fontWeight: TYPOGRAPHY.weight.bold, color: COLORS.textPrimary },
+  resultValue: { fontSize: TYPOGRAPHY.size["2xl"], fontWeight: TYPOGRAPHY.weight.bold, color: COLORS.primary, marginTop: SPACING.sm },
+  vsAvg: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textSecondary, marginTop: SPACING.sm },
+  gridFactor: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textSecondary, marginTop: SPACING.sm },
+  gridSource: { fontSize: TYPOGRAPHY.size.xs, color: COLORS.textMuted, marginTop: 2 },
+  breakdown: {
+    marginTop: SPACING.xl,
+    backgroundColor: COLORS.surface,
+    borderRadius: RADIUS.md,
+    padding: SPACING.lg,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
+  breakdownTitle: { fontSize: TYPOGRAPHY.size.base, fontWeight: TYPOGRAPHY.weight.semibold, marginBottom: SPACING.sm, color: COLORS.textPrimary },
   breakdownRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingVertical: 4,
+    paddingVertical: SPACING.xs,
   },
+  breakdownLabel: { fontSize: TYPOGRAPHY.size.base, color: COLORS.textPrimary },
+  breakdownValue: { fontSize: TYPOGRAPHY.size.base, fontWeight: TYPOGRAPHY.weight.semibold, color: COLORS.textSecondary },
   cta: {
     marginTop: SPACING.xl,
     backgroundColor: COLORS.primary,
@@ -545,5 +560,5 @@ const styles = StyleSheet.create({
     paddingVertical: SPACING.md,
     alignItems: "center",
   },
-  ctaLabel: { color: "#fff", fontWeight: "600" },
+  ctaLabel: { color: COLORS.primaryContrast, fontWeight: TYPOGRAPHY.weight.semibold },
 });

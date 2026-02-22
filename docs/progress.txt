@@ -1,0 +1,23 @@
+Design audit implementation progress
+
+Phase 1 (Critical) — COMPLETED 2025-02-21
+- Added design tokens: primaryContrast, primaryContrastMuted, overlay, primaryBorderSubtle (constants/colors.ts)
+- SplashScreen: logo "ET" → "EA"; all text colors use COLORS.primaryContrast / primaryContrastMuted
+- OnboardingScreen: primary button "Get started", secondary "Skip for now"; primaryButtonLabel uses primaryContrast
+- AppNavigator: contentStyle uses COLORS.background
+- HomeScreen: community card border uses primaryBorderSubtle; mission cards are Pressable → navigate to Missions, with pressed state and a11y
+- LeaderboardScreen: tab labels Global/Community/Weekly; tabs and rows use RADIUS.sm and SPACING; list items and tabs have accessibilityLabel/accessibilityRole
+- Shadows: ChallengeCard, StatsTileRow, MilestoneCard, OffsetSection use SHADOWS from constants/shadows.ts
+- CalculatorScreen: result breakdown has card styling (surface, padding, radius, border); breakdown row text styles; Recalculate button has a11y and pressed state
+- Modals/sheets: MissionsScreen, ChallengeCompletionModal, ShareBottomSheet use COLORS.overlay
+- Accessibility: AuthScreen (Google, Demo buttons); MissionsScreen (filter chips, Mark complete); LeaderboardScreen (tabs, list items); CommunityScreen (tabs, Join); ProfileScreen (share, sign out); CalculatorScreen (Recalculate); HomeScreen (mission cards, community card); BottomTabNavigator (tabBarAccessibilityLabel)
+- Replaced #fff with COLORS.primaryContrast for all on-primary text (buttons, avatars, labels) across touched screens and CommunityHeroBanner, OffsetSection, ChallengeCompletionModal, ShareBottomSheet
+- CommunityHeroBanner: meta text uses primaryContrastMuted
+
+Phase 2 (Refinement) — COMPLETED 2025-02-21
+- Typography: All screens and shared components use TYPOGRAPHY.size and TYPOGRAPHY.weight from constants/typography.ts (no raw fontSize/fontWeight).
+- Theme: constants/theme.ts refactored to derive Colors from COLORS (constants/colors.ts); single palette. Fonts kept for useThemeColor/ThemedView/ThemedText/Collapsible.
+- Spacing/radius: SplashScreen (logo 96, SPACING.xl, SPACING.base/sm/lg); OnboardingScreen (dots SPACING.sm/xl, RADIUS.sm); HomeScreen (progressWrap height SPACING.sm, borderRadius RADIUS.sm); CalculatorScreen (progressBar SPACING.xs, RADIUS.sm); MissionsScreen (cardAccent SPACING.xs, filterChip and completeBtn SPACING); LeaderboardScreen (avatar SPACING["3xl"], RADIUS.lg; rank width SPACING["2xl"]); CommunityScreen (backBtn, tab, typeChip SPACING); ProfileScreen (avatar SPACING["5xl"], RADIUS.full; historyRow paddingVertical SPACING.sm); ChallengeCard (borderLeftWidth SPACING.xs); MilestoneCard (progressBar height SPACING.sm, icon marginBottom SPACING.xs); CommunityHeroBanner (borderRadius RADIUS.lg); OffsetSection (reduceCard border primaryBorderSubtle; heroSub, providerDesc, verification marginTop SPACING.xs); ShareBottomSheet (preview borderRadius RADIUS.md).
+- Tab bar: tabBarLabelStyle uses TYPOGRAPHY.size.xs.
+
+Phase 3 (Polish) — Not started

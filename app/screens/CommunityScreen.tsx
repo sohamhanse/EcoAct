@@ -17,8 +17,9 @@ import { useCommunityStore } from "@/store/useCommunityStore";
 import { getCommunities, getMyCommunity, joinCommunity, leaveCommunity } from "@/api/community.api";
 import type { ApiCommunity } from "@/src/types";
 import { COLORS } from "@/constants/colors";
-import { SPACING } from "@/constants/spacing";
 import { RADIUS } from "@/constants/radius";
+import { SPACING } from "@/constants/spacing";
+import { TYPOGRAPHY } from "@/constants/typography";
 import { useCommunityStats } from "@/hooks/useCommunityStats";
 import { useChallenge } from "@/hooks/useChallenge";
 import { useActivityFeed } from "@/hooks/useActivityFeed";
@@ -136,10 +137,22 @@ export default function CommunityScreen() {
       </View>
 
       <View style={styles.tabs}>
-        <Pressable style={[styles.tab, tab === "discover" && styles.tabActive]} onPress={() => setTab("discover")}>
+        <Pressable
+          style={[styles.tab, tab === "discover" && styles.tabActive]}
+          onPress={() => setTab("discover")}
+          accessibilityLabel="Discover communities"
+          accessibilityRole="tab"
+          accessibilityState={{ selected: tab === "discover" }}
+        >
           <Text style={[styles.tabText, tab === "discover" && styles.tabTextActive]}>Discover</Text>
         </Pressable>
-        <Pressable style={[styles.tab, tab === "mine" && styles.tabActive]} onPress={() => setTab("mine")}>
+        <Pressable
+          style={[styles.tab, tab === "mine" && styles.tabActive]}
+          onPress={() => setTab("mine")}
+          accessibilityLabel="My community"
+          accessibilityRole="tab"
+          accessibilityState={{ selected: tab === "mine" }}
+        >
           <Text style={[styles.tabText, tab === "mine" && styles.tabTextActive]}>My community</Text>
         </Pressable>
       </View>
@@ -243,6 +256,8 @@ export default function CommunityScreen() {
                     style={[styles.joinBtn, joiningId === item._id && styles.joinBtnDisabled]}
                     onPress={() => handleJoin(item._id)}
                     disabled={!!joiningId}
+                    accessibilityLabel={`Join ${item.name}`}
+                    accessibilityRole="button"
                   >
                     <Text style={styles.joinBtnLabel}>{joiningId === item._id ? "…" : "Join"}</Text>
                   </Pressable>
@@ -275,40 +290,40 @@ export default function CommunityScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   header: { flexDirection: "row", alignItems: "center", padding: SPACING.base, borderBottomWidth: 1, borderBottomColor: COLORS.border },
-  backBtn: { paddingVertical: 8, paddingRight: 16 },
-  backBtnLabel: { fontSize: 16, color: COLORS.primary, fontWeight: "600" },
-  title: { fontSize: 20, fontWeight: "700", color: COLORS.textPrimary },
+  backBtn: { paddingVertical: SPACING.sm, paddingRight: SPACING.base },
+  backBtnLabel: { fontSize: TYPOGRAPHY.size.base, color: COLORS.primary, fontWeight: TYPOGRAPHY.weight.semibold },
+  title: { fontSize: TYPOGRAPHY.size.lg, fontWeight: TYPOGRAPHY.weight.bold, color: COLORS.textPrimary },
   tabs: { flexDirection: "row", padding: SPACING.base, gap: SPACING.sm },
-  tab: { paddingVertical: 8, paddingHorizontal: 16, borderRadius: RADIUS.sm },
+  tab: { paddingVertical: SPACING.sm, paddingHorizontal: SPACING.base, borderRadius: RADIUS.sm },
   tabActive: { backgroundColor: COLORS.primaryPale },
-  tabText: { fontSize: 14, color: COLORS.textSecondary },
-  tabTextActive: { color: COLORS.primary, fontWeight: "600" },
-  search: { marginHorizontal: SPACING.base, marginBottom: SPACING.sm, padding: SPACING.md, backgroundColor: COLORS.surface, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.border, fontSize: 15 },
+  tabText: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textSecondary },
+  tabTextActive: { color: COLORS.primary, fontWeight: TYPOGRAPHY.weight.semibold },
+  search: { marginHorizontal: SPACING.base, marginBottom: SPACING.sm, padding: SPACING.md, backgroundColor: COLORS.surface, borderRadius: RADIUS.md, borderWidth: 1, borderColor: COLORS.border, fontSize: TYPOGRAPHY.size.base },
   typeRow: { flexDirection: "row", paddingHorizontal: SPACING.base, gap: SPACING.sm, marginBottom: SPACING.sm },
-  typeChip: { paddingVertical: 6, paddingHorizontal: 12, borderRadius: 999, backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border },
+  typeChip: { paddingVertical: SPACING.xs, paddingHorizontal: SPACING.md, borderRadius: RADIUS.full, backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border },
   typeChipActive: { backgroundColor: COLORS.primaryPale, borderColor: COLORS.primary },
-  typeChipText: { fontSize: 13, color: COLORS.textSecondary },
-  typeChipTextActive: { color: COLORS.primary, fontWeight: "600" },
+  typeChipText: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textSecondary },
+  typeChipTextActive: { color: COLORS.primary, fontWeight: TYPOGRAPHY.weight.semibold },
   list: { padding: SPACING.base, paddingBottom: SPACING["3xl"] },
   scroll: { flex: 1 },
   scrollContent: { padding: SPACING.base, paddingBottom: SPACING["3xl"] },
   sectionTitle: {
-    fontSize: 12,
-    fontWeight: "700",
+    fontSize: TYPOGRAPHY.size.xs,
+    fontWeight: TYPOGRAPHY.weight.bold,
     color: COLORS.textMuted,
     letterSpacing: 0.5,
     marginBottom: SPACING.sm,
   },
   card: { backgroundColor: COLORS.surface, borderRadius: RADIUS.md, padding: SPACING.lg, marginBottom: SPACING.md, borderWidth: 1, borderColor: COLORS.border },
-  cardName: { fontSize: 18, fontWeight: "700", color: COLORS.textPrimary },
-  cardType: { fontSize: 13, color: COLORS.textSecondary, marginTop: 2, textTransform: "capitalize" },
-  cardMeta: { fontSize: 13, color: COLORS.textMuted, marginTop: 4 },
-  cardDesc: { fontSize: 13, color: COLORS.textSecondary, marginTop: 8 },
-  joinBtn: { marginTop: 12, backgroundColor: COLORS.primary, borderRadius: RADIUS.sm, paddingVertical: 10, alignItems: "center" },
+  cardName: { fontSize: TYPOGRAPHY.size.md, fontWeight: TYPOGRAPHY.weight.bold, color: COLORS.textPrimary },
+  cardType: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textSecondary, marginTop: 2, textTransform: "capitalize" },
+  cardMeta: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textMuted, marginTop: SPACING.xs },
+  cardDesc: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textSecondary, marginTop: SPACING.sm },
+  joinBtn: { marginTop: SPACING.md, backgroundColor: COLORS.primary, borderRadius: RADIUS.sm, paddingVertical: SPACING.md, alignItems: "center" },
   joinBtnDisabled: { opacity: 0.7 },
-  joinBtnLabel: { color: "#fff", fontWeight: "600" },
-  joinedLabel: { marginTop: 12, fontSize: 14, color: COLORS.success, fontWeight: "600" },
-  leaveBtn: { marginTop: SPACING.xl, paddingVertical: 10, alignItems: "center" },
-  leaveBtnLabel: { color: COLORS.danger, fontWeight: "600" },
-  empty: { padding: SPACING.xl, fontSize: 15, color: COLORS.textSecondary, textAlign: "center" },
+  joinBtnLabel: { color: COLORS.primaryContrast, fontWeight: TYPOGRAPHY.weight.semibold },
+  joinedLabel: { marginTop: SPACING.md, fontSize: TYPOGRAPHY.size.sm, color: COLORS.success, fontWeight: TYPOGRAPHY.weight.semibold },
+  leaveBtn: { marginTop: SPACING.xl, paddingVertical: SPACING.md, alignItems: "center" },
+  leaveBtnLabel: { color: COLORS.danger, fontWeight: TYPOGRAPHY.weight.semibold },
+  empty: { padding: SPACING.xl, fontSize: TYPOGRAPHY.size.base, color: COLORS.textSecondary, textAlign: "center" },
 });

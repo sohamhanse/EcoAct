@@ -1,6 +1,7 @@
 import { COLORS } from "@/constants/colors";
 import { RADIUS } from "@/constants/radius";
 import { SPACING } from "@/constants/spacing";
+import { TYPOGRAPHY } from "@/constants/typography";
 import type { RootStackParamList } from "@/navigation/AppNavigator";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -59,11 +60,11 @@ export default function OnboardingScreen({ navigation }: Props) {
       </View>
 
       <Pressable style={styles.primaryButton} onPress={continueToAuth}>
-        <Text style={styles.primaryButtonLabel}>Continue with Google</Text>
+        <Text style={styles.primaryButtonLabel}>Get started</Text>
       </Pressable>
 
       <Pressable style={styles.secondaryButton} onPress={continueToAuth}>
-        <Text style={styles.secondaryButtonLabel}>Skip to calculator</Text>
+        <Text style={styles.secondaryButtonLabel}>Skip for now</Text>
       </Pressable>
     </View>
   );
@@ -83,44 +84,44 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.xl,
   },
   heroTitle: {
-    color: "#ecfdf5",
-    fontSize: 28,
-    fontWeight: "700",
+    color: COLORS.primaryContrast,
+    fontSize: TYPOGRAPHY.size.xl,
+    fontWeight: TYPOGRAPHY.weight.bold,
   },
   heroSubtitle: {
-    color: "#ccfbf1",
-    fontSize: 14,
-    marginTop: 4,
+    color: COLORS.primaryContrastMuted,
+    fontSize: TYPOGRAPHY.size.sm,
+    marginTop: SPACING.xs,
   },
   slide: {
     paddingHorizontal: SPACING.base,
     justifyContent: "center",
   },
   slideTitle: {
-    fontSize: 22,
-    fontWeight: "700",
+    fontSize: TYPOGRAPHY.size.lg,
+    fontWeight: TYPOGRAPHY.weight.bold,
     color: COLORS.textPrimary,
   },
   slideSubtitle: {
-    fontSize: 15,
+    fontSize: TYPOGRAPHY.size.base,
     color: COLORS.textSecondary,
-    marginTop: 8,
+    marginTop: SPACING.sm,
   },
   dots: {
     flexDirection: "row",
     justifyContent: "center",
-    gap: 8,
+    gap: SPACING.sm,
     marginVertical: SPACING.base,
   },
   dot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
+    width: SPACING.sm,
+    height: SPACING.sm,
+    borderRadius: RADIUS.sm,
     backgroundColor: COLORS.border,
   },
   dotActive: {
     backgroundColor: COLORS.primary,
-    width: 24,
+    width: SPACING.xl,
   },
   primaryButton: {
     backgroundColor: COLORS.primary,
@@ -130,9 +131,9 @@ const styles = StyleSheet.create({
     marginTop: SPACING.lg,
   },
   primaryButtonLabel: {
-    color: "#fff",
-    fontWeight: "600",
-    fontSize: 16,
+    color: COLORS.primaryContrast,
+    fontWeight: TYPOGRAPHY.weight.semibold,
+    fontSize: TYPOGRAPHY.size.base,
   },
   secondaryButton: {
     alignItems: "center",
@@ -141,7 +142,7 @@ const styles = StyleSheet.create({
   },
   secondaryButtonLabel: {
     color: COLORS.primary,
-    fontWeight: "600",
-    fontSize: 15,
+    fontWeight: TYPOGRAPHY.weight.semibold,
+    fontSize: TYPOGRAPHY.size.base,
   },
 });

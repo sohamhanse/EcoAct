@@ -2,6 +2,7 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons } from "@expo/vector-icons";
 import { COLORS } from "@/constants/colors";
 import { SPACING } from "@/constants/spacing";
+import { TYPOGRAPHY } from "@/constants/typography";
 import HomeScreen from "@/app/screens/HomeScreen";
 import CalculatorScreen from "@/app/screens/CalculatorScreen";
 import MissionsScreen from "@/app/screens/MissionsScreen";
@@ -33,6 +34,7 @@ export function BottomTabNavigator() {
         headerShown: false,
         tabBarActiveTintColor: COLORS.primary,
         tabBarInactiveTintColor: COLORS.textMuted,
+        tabBarAccessibilityLabel: `${route.name} tab`,
         tabBarStyle: {
           backgroundColor: COLORS.surface,
           borderTopColor: COLORS.border,
@@ -41,7 +43,7 @@ export function BottomTabNavigator() {
           paddingTop: SPACING.sm,
           height: 60,
         },
-        tabBarLabelStyle: { fontSize: 11 },
+        tabBarLabelStyle: { fontSize: TYPOGRAPHY.size.xs },
         tabBarIcon: ({ focused, color, size }) => (
           <Ionicons
             name={focused ? tabIcons[route.name].active : tabIcons[route.name].inactive}

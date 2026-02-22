@@ -12,8 +12,9 @@ import ViewShot from "react-native-view-shot";
 import { ShareCard, type SharePayload } from "./ShareCard";
 import { captureAndShare, saveToCameraRoll } from "@/services/sharing.service";
 import { COLORS } from "@/constants/colors";
-import { SPACING } from "@/constants/spacing";
 import { RADIUS } from "@/constants/radius";
+import { SPACING } from "@/constants/spacing";
+import { TYPOGRAPHY } from "@/constants/typography";
 
 const PREVIEW_SCALE = 0.5;
 
@@ -110,7 +111,7 @@ export function ShareBottomSheet({ visible, payload, onDismiss }: Props) {
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: COLORS.overlay,
     justifyContent: "flex-end",
   },
   sheet: {
@@ -121,8 +122,8 @@ const styles = StyleSheet.create({
     paddingBottom: SPACING["3xl"],
   },
   title: {
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: TYPOGRAPHY.size.md,
+    fontWeight: TYPOGRAPHY.weight.bold,
     color: COLORS.textPrimary,
     textAlign: "center",
     marginBottom: SPACING.lg,
@@ -134,7 +135,7 @@ const styles = StyleSheet.create({
   preview: {
     width: 360,
     height: 640,
-    borderRadius: 12,
+    borderRadius: RADIUS.md,
     overflow: "hidden",
   },
   buttons: {
@@ -151,9 +152,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   shareBtnLabel: {
-    color: "#fff",
-    fontWeight: "600",
-    fontSize: 14,
+    color: COLORS.primaryContrast,
+    fontWeight: TYPOGRAPHY.weight.semibold,
+    fontSize: TYPOGRAPHY.size.sm,
   },
   actions: {
     flexDirection: "row",
@@ -169,7 +170,7 @@ const styles = StyleSheet.create({
   },
   saveBtnLabel: {
     color: COLORS.primary,
-    fontWeight: "600",
+    fontWeight: TYPOGRAPHY.weight.semibold,
   },
   cancelBtn: {
     paddingVertical: SPACING.md,
@@ -178,5 +179,6 @@ const styles = StyleSheet.create({
   },
   cancelBtnLabel: {
     color: COLORS.textMuted,
+    fontSize: TYPOGRAPHY.size.base,
   },
 });

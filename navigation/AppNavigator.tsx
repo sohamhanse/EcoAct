@@ -1,4 +1,5 @@
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { COLORS } from "@/constants/colors";
 import { MainNavigator } from "./MainNavigator";
 import OnboardingScreen from "@/app/screens/OnboardingScreen";
 import AuthScreen from "@/app/screens/AuthScreen";
@@ -26,7 +27,7 @@ export function AppNavigator() {
       initialRouteName="Splash"
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: "#F7FAF8" },
+        contentStyle: { backgroundColor: COLORS.background },
       }}
     >
       <Stack.Screen name="Splash" component={SplashScreen} />

@@ -1,16 +1,10 @@
 import React from "react";
 import { View, Text, StyleSheet } from "react-native";
 import { COLORS } from "@/constants/colors";
-import { SPACING } from "@/constants/spacing";
 import { RADIUS } from "@/constants/radius";
-
-const shadowMd = {
-  shadowColor: "#000",
-  shadowOffset: { width: 0, height: 4 },
-  shadowOpacity: 0.08,
-  shadowRadius: 12,
-  elevation: 4,
-};
+import { SHADOWS } from "@/constants/shadows";
+import { SPACING } from "@/constants/spacing";
+import { TYPOGRAPHY } from "@/constants/typography";
 
 type Props = {
   thisMonthCo2: number;
@@ -25,12 +19,12 @@ export const StatsTileRow = React.memo(function StatsTileRow({
 }: Props) {
   return (
     <View style={styles.row}>
-      <View style={[styles.tile, shadowMd]}>
+      <View style={[styles.tile, SHADOWS.md]}>
         <Text style={styles.label}>This Month</Text>
         <Text style={styles.value}>{thisMonthCo2} kg</Text>
         <Text style={styles.sublabel}>CO₂ saved</Text>
       </View>
-      <View style={[styles.tile, shadowMd]}>
+      <View style={[styles.tile, SHADOWS.md]}>
         <Text style={styles.label}>vs Last Month</Text>
         <Text
           style={[
@@ -45,7 +39,7 @@ export const StatsTileRow = React.memo(function StatsTileRow({
           {monthOverMonthChange >= 0 ? "↑ more action" : "↓ less action"}
         </Text>
       </View>
-      <View style={[styles.tile, shadowMd]}>
+      <View style={[styles.tile, SHADOWS.md]}>
         <Text style={styles.label}>Per Member</Text>
         <Text style={styles.value}>{avgCo2PerMember} kg</Text>
         <Text style={styles.sublabel}>avg</Text>
@@ -69,15 +63,15 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   label: {
-    fontSize: 11,
+    fontSize: TYPOGRAPHY.size.xs,
     color: COLORS.textSecondary,
-    fontWeight: "600",
+    fontWeight: TYPOGRAPHY.weight.semibold,
   },
   value: {
-    fontSize: 18,
-    fontWeight: "700",
+    fontSize: TYPOGRAPHY.size.md,
+    fontWeight: TYPOGRAPHY.weight.bold,
     color: COLORS.primary,
-    marginTop: 4,
+    marginTop: SPACING.xs,
   },
   valuePositive: {
     color: COLORS.success,
@@ -86,7 +80,7 @@ const styles = StyleSheet.create({
     color: COLORS.danger,
   },
   sublabel: {
-    fontSize: 11,
+    fontSize: TYPOGRAPHY.size.xs,
     color: COLORS.textMuted,
     marginTop: 2,
   },

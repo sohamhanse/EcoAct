@@ -15,8 +15,9 @@ import type { ApiMission } from "@/src/types";
 import { ShareBottomSheet } from "@/components/sharing/ShareBottomSheet";
 import type { SharePayload } from "@/components/sharing/ShareCard";
 import { COLORS } from "@/constants/colors";
-import { SPACING } from "@/constants/spacing";
 import { RADIUS } from "@/constants/radius";
+import { SPACING } from "@/constants/spacing";
+import { TYPOGRAPHY } from "@/constants/typography";
 
 const CATEGORIES = ["All", "transport", "food", "energy", "shopping", "water"] as const;
 
@@ -92,6 +93,9 @@ export default function MissionsScreen() {
             key={c}
             style={[styles.filterChip, filter === c && styles.filterChipActive]}
             onPress={() => setFilter(c)}
+            accessibilityLabel={`Filter by ${c}`}
+            accessibilityRole="button"
+            accessibilityState={{ selected: filter === c }}
           >
             <Text style={[styles.filterChipText, filter === c && styles.filterChipTextActive]}>{c}</Text>
           </Pressable>
@@ -125,6 +129,8 @@ export default function MissionsScreen() {
                   style={[styles.completeBtn, completingId === item._id && styles.completeBtnDisabled]}
                   onPress={() => handleComplete(item._id)}
                   disabled={!!completingId}
+                  accessibilityLabel={`Mark complete: ${item.title}`}
+                  accessibilityRole="button"
                 >
                   <Text style={styles.completeBtnLabel}>
                     {completingId === item._id ? "…" : "Mark complete"}
@@ -184,41 +190,41 @@ export default function MissionsScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.background },
   filterRow: { flexDirection: "row", flexWrap: "wrap", padding: SPACING.base, gap: SPACING.sm },
-  filterChip: { paddingVertical: 6, paddingHorizontal: 12, borderRadius: RADIUS.full, backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border },
+  filterChip: { paddingVertical: SPACING.xs, paddingHorizontal: SPACING.md, borderRadius: RADIUS.full, backgroundColor: COLORS.surface, borderWidth: 1, borderColor: COLORS.border },
   filterChipActive: { backgroundColor: COLORS.primaryPale, borderColor: COLORS.primary },
-  filterChipText: { fontSize: 13, color: COLORS.textSecondary },
-  filterChipTextActive: { color: COLORS.primary, fontWeight: "600" },
+  filterChipText: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textSecondary },
+  filterChipTextActive: { color: COLORS.primary, fontWeight: TYPOGRAPHY.weight.semibold },
   statsBar: { paddingHorizontal: SPACING.base, paddingBottom: SPACING.sm },
-  statsText: { fontSize: 13, color: COLORS.textSecondary },
+  statsText: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textSecondary },
   list: { padding: SPACING.base, paddingBottom: SPACING["3xl"] },
   card: { flexDirection: "row", backgroundColor: COLORS.surface, borderRadius: RADIUS.md, marginBottom: SPACING.md, overflow: "hidden", borderWidth: 1, borderColor: COLORS.border },
-  cardAccent: { width: 4 },
+  cardAccent: { width: SPACING.xs },
   cardBody: { flex: 1, padding: SPACING.md },
-  cardTitle: { fontSize: 16, fontWeight: "600", color: COLORS.textPrimary },
-  cardDesc: { fontSize: 13, color: COLORS.textSecondary, marginTop: 4 },
-  badges: { flexDirection: "row", alignItems: "center", gap: 8, marginTop: 8 },
-  co2Badge: { backgroundColor: COLORS.primaryPale, paddingHorizontal: 8, paddingVertical: 2, borderRadius: RADIUS.sm },
-  co2BadgeText: { fontSize: 12, color: COLORS.primary, fontWeight: "600" },
-  pointsBadge: { fontSize: 12, color: COLORS.textSecondary },
-  diffBadge: { fontSize: 11, color: COLORS.textMuted, textTransform: "capitalize" },
-  completeBtn: { marginTop: 12, backgroundColor: COLORS.primary, borderRadius: RADIUS.sm, paddingVertical: 8, alignItems: "center" },
+  cardTitle: { fontSize: TYPOGRAPHY.size.base, fontWeight: TYPOGRAPHY.weight.semibold, color: COLORS.textPrimary },
+  cardDesc: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textSecondary, marginTop: SPACING.xs },
+  badges: { flexDirection: "row", alignItems: "center", gap: SPACING.sm, marginTop: SPACING.sm },
+  co2Badge: { backgroundColor: COLORS.primaryPale, paddingHorizontal: SPACING.sm, paddingVertical: 2, borderRadius: RADIUS.sm },
+  co2BadgeText: { fontSize: TYPOGRAPHY.size.xs, color: COLORS.primary, fontWeight: TYPOGRAPHY.weight.semibold },
+  pointsBadge: { fontSize: TYPOGRAPHY.size.xs, color: COLORS.textSecondary },
+  diffBadge: { fontSize: TYPOGRAPHY.size.xs, color: COLORS.textMuted, textTransform: "capitalize" },
+  completeBtn: { marginTop: SPACING.md, backgroundColor: COLORS.primary, borderRadius: RADIUS.sm, paddingVertical: SPACING.sm, alignItems: "center" },
   completeBtnDisabled: { opacity: 0.7 },
-  completeBtnLabel: { color: "#fff", fontWeight: "600", fontSize: 14 },
-  modalOverlay: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: "center", alignItems: "center", padding: SPACING.xl },
+  completeBtnLabel: { color: COLORS.primaryContrast, fontWeight: TYPOGRAPHY.weight.semibold, fontSize: TYPOGRAPHY.size.sm },
+  modalOverlay: { flex: 1, backgroundColor: COLORS.overlay, justifyContent: "center", alignItems: "center", padding: SPACING.xl },
   modalBox: { backgroundColor: COLORS.surface, borderRadius: RADIUS.lg, padding: SPACING.xl, width: "100%", maxWidth: 320 },
-  modalTitle: { fontSize: 20, fontWeight: "700", color: COLORS.textPrimary, textAlign: "center" },
-  modalPoints: { fontSize: 24, fontWeight: "700", color: COLORS.primary, textAlign: "center", marginTop: SPACING.md },
-  modalCo2: { fontSize: 16, color: COLORS.success, textAlign: "center", marginTop: 4 },
-  modalBadges: { fontSize: 13, color: COLORS.textSecondary, textAlign: "center", marginTop: 8 },
-  modalBtn: { marginTop: SPACING.xl, backgroundColor: COLORS.primary, borderRadius: RADIUS.md, paddingVertical: 12, alignItems: "center" },
-  modalBtnLabel: { color: "#fff", fontWeight: "600" },
+  modalTitle: { fontSize: TYPOGRAPHY.size.lg, fontWeight: TYPOGRAPHY.weight.bold, color: COLORS.textPrimary, textAlign: "center" },
+  modalPoints: { fontSize: TYPOGRAPHY.size.xl, fontWeight: TYPOGRAPHY.weight.bold, color: COLORS.primary, textAlign: "center", marginTop: SPACING.md },
+  modalCo2: { fontSize: TYPOGRAPHY.size.base, color: COLORS.success, textAlign: "center", marginTop: SPACING.xs },
+  modalBadges: { fontSize: TYPOGRAPHY.size.sm, color: COLORS.textSecondary, textAlign: "center", marginTop: SPACING.sm },
+  modalBtn: { marginTop: SPACING.xl, backgroundColor: COLORS.primary, borderRadius: RADIUS.md, paddingVertical: SPACING.md, alignItems: "center" },
+  modalBtnLabel: { color: COLORS.primaryContrast, fontWeight: TYPOGRAPHY.weight.semibold },
   shareBadgeBtn: {
     marginTop: SPACING.md,
-    paddingVertical: 10,
+    paddingVertical: SPACING.md,
     alignItems: "center",
     borderWidth: 1,
     borderColor: COLORS.primary,
     borderRadius: RADIUS.md,
   },
-  shareBadgeBtnLabel: { color: COLORS.primary, fontWeight: "600", fontSize: 14 },
+  shareBadgeBtnLabel: { color: COLORS.primary, fontWeight: TYPOGRAPHY.weight.semibold, fontSize: TYPOGRAPHY.size.sm },
 });

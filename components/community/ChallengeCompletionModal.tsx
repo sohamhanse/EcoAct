@@ -3,8 +3,9 @@ import { Modal, View, Text, StyleSheet, Pressable } from "react-native";
 import type { CommunityChallengeResponse } from "@/src/types";
 import type { SharePayload } from "@/components/sharing/ShareCard";
 import { COLORS } from "@/constants/colors";
-import { SPACING } from "@/constants/spacing";
 import { RADIUS } from "@/constants/radius";
+import { SPACING } from "@/constants/spacing";
+import { TYPOGRAPHY } from "@/constants/typography";
 
 type Props = {
   visible: boolean;
@@ -69,7 +70,7 @@ export const ChallengeCompletionModal = React.memo(function ChallengeCompletionM
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: COLORS.overlay,
     justifyContent: "center",
     alignItems: "center",
     padding: SPACING.xl,
@@ -83,30 +84,30 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   emoji: {
-    fontSize: 48,
+    fontSize: TYPOGRAPHY.size["4xl"],
     marginBottom: SPACING.sm,
   },
   title: {
-    fontSize: 22,
-    fontWeight: "700",
+    fontSize: TYPOGRAPHY.size.lg,
+    fontWeight: TYPOGRAPHY.weight.bold,
     color: COLORS.textPrimary,
     textAlign: "center",
   },
   challengeTitle: {
-    fontSize: 16,
-    fontWeight: "600",
+    fontSize: TYPOGRAPHY.size.base,
+    fontWeight: TYPOGRAPHY.weight.semibold,
     color: COLORS.primary,
     marginTop: SPACING.sm,
     textAlign: "center",
   },
   stats: {
-    fontSize: 15,
+    fontSize: TYPOGRAPHY.size.base,
     color: COLORS.textSecondary,
     marginTop: SPACING.md,
     textAlign: "center",
   },
   contributors: {
-    fontSize: 14,
+    fontSize: TYPOGRAPHY.size.sm,
     color: COLORS.textMuted,
     marginTop: SPACING.xs,
     textAlign: "center",
@@ -120,9 +121,9 @@ const styles = StyleSheet.create({
     alignSelf: "stretch",
   },
   shareButtonLabel: {
-    color: "#fff",
-    fontWeight: "600",
-    fontSize: 16,
+    color: COLORS.primaryContrast,
+    fontWeight: TYPOGRAPHY.weight.semibold,
+    fontSize: TYPOGRAPHY.size.base,
     textAlign: "center",
   },
   button: {
@@ -133,8 +134,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: SPACING.xl,
   },
   buttonLabel: {
-    color: "#fff",
-    fontWeight: "600",
-    fontSize: 16,
+    color: COLORS.primaryContrast,
+    fontWeight: TYPOGRAPHY.weight.semibold,
+    fontSize: TYPOGRAPHY.size.base,
   },
 });
