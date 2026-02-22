@@ -1,6 +1,20 @@
 import { axiosInstance } from "./axiosInstance";
 import type { LeaderboardEntry } from "@/src/types";
 
+export interface MyLeaderboardRank {
+  globalRank: number;
+  totalGlobal: number;
+  communityRank: number | null;
+  totalCommunity: number | null;
+  weeklyRank: number;
+  totalWeekly: number;
+}
+
+export async function getMyLeaderboardRank(): Promise<MyLeaderboardRank> {
+  const { data } = await axiosInstance.get<MyLeaderboardRank>("/leaderboard/me");
+  return data;
+}
+
 export async function getGlobalLeaderboard(page = 1): Promise<{
   leaderboard: LeaderboardEntry[];
   total: number;

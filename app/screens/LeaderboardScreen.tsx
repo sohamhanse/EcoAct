@@ -64,10 +64,20 @@ export default function LeaderboardScreen() {
       </View>
       {loading ? (
         <ActivityIndicator color={COLORS.primary} style={{ marginTop: SPACING.xl }} />
+      ) : tab === "community" && !user?.communityId ? (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyText}>Join a community to see the community leaderboard.</Text>
+          <Text style={styles.emptySubtext}>Go to the Community tab to discover and join.</Text>
+        </View>
+      ) : list.length === 0 ? (
+        <View style={styles.emptyState}>
+          <Text style={styles.emptyText}>No one on the leaderboard yet.</Text>
+          <Text style={styles.emptySubtext}>Complete missions to climb the ranks.</Text>
+        </View>
       ) : (
         <FlatList
           data={list}
-          keyExtractor={(item) => item._id + item.rank}
+          keyExtractor={(item) => String(item._id) + item.rank}
           contentContainerStyle={styles.list}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.primary} />}
           renderItem={({ item }) => (
@@ -102,4 +112,7 @@ const styles = StyleSheet.create({
   info: { flex: 1 },
   name: { fontSize: 16, fontWeight: "600", color: COLORS.textPrimary },
   meta: { fontSize: 12, color: COLORS.textSecondary, marginTop: 2 },
+  emptyState: { padding: SPACING.xl, alignItems: "center" },
+  emptyText: { fontSize: 16, color: COLORS.textSecondary, textAlign: "center" },
+  emptySubtext: { fontSize: 14, color: COLORS.textMuted, marginTop: SPACING.sm, textAlign: "center" },
 });

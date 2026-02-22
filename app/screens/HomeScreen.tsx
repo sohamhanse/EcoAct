@@ -15,6 +15,7 @@ import { useCommunityStore } from "@/store/useCommunityStore";
 import { getRecommendedMissions } from "@/api/missions.api";
 import { useMilestones } from "@/hooks/useMilestones";
 import { getMyCommunity } from "@/api/community.api";
+import { getMyLeaderboardRank } from "@/api/leaderboard.api";
 import type { MainStackParamList } from "@/navigation/MainNavigator";
 import type { ApiMission } from "@/src/types";
 import { MilestoneCard } from "@/components/milestones/MilestoneCard";
@@ -39,12 +40,18 @@ export default function HomeScreen() {
   const [refreshing, setRefreshing] = useState(false);
   const { active: milestones, loading: milestonesLoading, refetch: refetchMilestones } = useMilestones();
   const [sharePayload, setSharePayload] = useState<SharePayload | null>(null);
+  const [globalRank, setGlobalRank] = useState<number | null>(null);
 
   const load = useCallback(async () => {
     try {
-      const [rec, comm] = await Promise.all([getRecommendedMissions(), getMyCommunity()]);
+      const [rec, comm, rankRes] = await Promise.all([
+        getRecommendedMissions(),
+        getMyCommunity(),
+        getMyLeaderboardRank().catch(() => null),
+      ]);
       setMissions(rec);
       setMine(comm.community ?? null);
+      setGlobalRank(rankRes?.globalRank ?? null);
       refetchMilestones();
     } catch {
       setMissions([]);
@@ -125,7 +132,7 @@ export default function HomeScreen() {
           <Text style={styles.statLabel}>Streak</Text>
         </View>
         <View style={styles.statBox}>
-          <Text style={styles.statValue}>—</Text>
+          <Text style={styles.statValue}>{globalRank != null ? `#${globalRank}` : "—"}</Text>
           <Text style={styles.statLabel}>Rank</Text>
         </View>
       </View>

@@ -1,9 +1,77 @@
 import type { Response } from "express";
+import mongoose from "mongoose";
 import { User } from "../models/User.model.js";
 import { success, error } from "../utils/response.utils.js";
 import type { AuthRequest } from "../middleware/auth.middleware.js";
 
 const PAGE_SIZE = 20;
+
+function getStartOfWeek(): Date {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  d.setDate(diff);
+  return d;
+}
+
+/**
+ * Returns the current user's rank (1-based) and total count for global, community (if in one), and weekly.
+ * Requires auth.
+ */
+export async function me(req: AuthRequest, res: Response): Promise<void> {
+  if (!req.user?.userId) {
+    error(res, "Not authenticated", "UNAUTHORIZED", 401);
+    return;
+  }
+  const userId = new mongoose.Types.ObjectId(req.user.userId);
+  const user = await User.findById(userId).select("totalPoints communityId").lean();
+  if (!user) {
+    error(res, "User not found", "NOT_FOUND", 404);
+    return;
+  }
+
+  const [globalRank, communityRank, weeklyRank] = await Promise.all([
+    User.countDocuments({ totalPoints: { $gt: user.totalPoints } }).then((n) => n + 1),
+    user.communityId
+      ? User.countDocuments({ communityId: user.communityId, totalPoints: { $gt: user.totalPoints } }).then((n) => n + 1)
+      : Promise.resolve(null),
+    (async () => {
+      const UserMission = (await import("../models/UserMission.model.js")).UserMission;
+      const startOfWeek = getStartOfWeek();
+      const myWeekly = await UserMission.aggregate([
+        { $match: { userId, completedAt: { $gte: startOfWeek } } },
+        { $group: { _id: null, points: { $sum: "$pointsAwarded" } } },
+      ]);
+      const myPoints = myWeekly[0]?.points ?? 0;
+      const betterCount = await UserMission.aggregate([
+        { $match: { completedAt: { $gte: startOfWeek } } },
+        { $group: { _id: "$userId", points: { $sum: "$pointsAwarded" } } },
+        { $match: { points: { $gt: myPoints } } },
+        { $count: "n" },
+      ]);
+      return (betterCount[0]?.n ?? 0) + 1;
+    })(),
+  ]);
+
+  const [totalGlobal, totalCommunity, totalWeekly] = await Promise.all([
+    User.countDocuments(),
+    user.communityId ? User.countDocuments({ communityId: user.communityId }) : Promise.resolve(null),
+    (async () => {
+      const UserMission = (await import("../models/UserMission.model.js")).UserMission;
+      return UserMission.distinct("userId", { completedAt: { $gte: getStartOfWeek() } }).then((ids) => ids.length);
+    })(),
+  ]);
+
+  success(res, {
+    globalRank,
+    totalGlobal,
+    communityRank: communityRank ?? null,
+    totalCommunity: totalCommunity ?? null,
+    weeklyRank,
+    totalWeekly,
+  });
+}
 
 export async function global(req: AuthRequest, res: Response): Promise<void> {
   const page = Math.max(1, parseInt(String(req.query.page), 10) || 1);
@@ -39,11 +107,7 @@ export async function community(req: AuthRequest, res: Response): Promise<void> 
 }
 
 export async function weekly(req: AuthRequest, res: Response): Promise<void> {
-  const startOfWeek = new Date();
-  startOfWeek.setHours(0, 0, 0, 0);
-  const day = startOfWeek.getDay();
-  const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1);
-  startOfWeek.setDate(diff);
+  const startOfWeek = getStartOfWeek();
   const page = Math.max(1, parseInt(String(req.query.page), 10) || 1);
   const skip = (page - 1) * PAGE_SIZE;
   const UserMission = (await import("../models/UserMission.model.js")).UserMission;
